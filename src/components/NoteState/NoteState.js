@@ -109,7 +109,7 @@ const NoteState = ({ annotation, isSelected }) => {
         <div ref={popupRef} className="options" onClick={closePopup}>
           {!isStateDisabled && !isReply && (
             <div data-element="notePopupState">
-              <div
+              {/* <div
                 data-element="notePopupStateAccepted"
                 className="option"
                 onClick={() => handleStateUpdate('Accepted')}
@@ -132,7 +132,7 @@ const NoteState = ({ annotation, isSelected }) => {
               >
                 <Icon glyph="icon-annotation-status-cancelled" />
                 {t('option.state.cancelled')}
-              </div>
+              </div> */}
               <div
                 data-element="notePopupStateCompleted"
                 className="option"
