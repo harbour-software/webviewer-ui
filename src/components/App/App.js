@@ -35,6 +35,9 @@ import CopyTextHandler from 'components/CopyTextHandler';
 import PrintHandler from 'components/PrintHandler';
 import FontHandler from 'components/FontHandler';
 import ZoomOverlay from 'components/ZoomOverlay';
+import PagePreviousOverlay from 'components/PagePreviousOverlay';
+import PageNextOverlay from 'components/PageNextOverlay';
+import PageSliderOverlay from 'components/PageSliderOverlay';
 import CreateStampModal from 'components/CreateStampModal';
 import CustomModal from 'components/CustomModal';
 
@@ -105,6 +108,9 @@ const App = ({ removeEventHandlers }) => {
         </div>
         <ViewControlsOverlay />
         <MenuOverlay />
+        <PageSliderOverlay />
+        <PagePreviousOverlay />
+        <PageNextOverlay />
         <ZoomOverlay />
         <AnnotationContentOverlay />
 
