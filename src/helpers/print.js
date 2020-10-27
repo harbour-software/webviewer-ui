@@ -120,17 +120,50 @@ export const creatingPages = (pagesToPrint, includeComments, includeAnnot, print
 };
 
 export const printPages = pages => {
-  const printHandler = document.getElementById('print-handler');
-  printHandler.innerHTML = '';
+  const isCordovaPrinter = window.parent.cordova && window.parent.cordova.plugins.printer;
+  let printHandler;
+  if (isCordovaPrinter) {
+    printHandler = document.createElement('div');
+    printHandler.style.display = 'block';
+    printHandler.style.height = '100%';
+  } else {
+    printHandler = document.getElementById('print-handler');
+    printHandler.innerHTML = '';
+  }
 
   const fragment = document.createDocumentFragment();
-  pages.forEach(page => {
+  pages.forEach((page, index) => {
+    if (isCordovaPrinter) {
+      page.style.display = 'block';
+      page.style.maxWidth = '100%';
+      page.style.maxHeight = '100%';
+      page.style.width = '100%';
+      page.style.height = '100%';
+      page.style.objectFit = 'contain';
+      if (index > 0) {
+        page.style.pageBreakAfter = 'always';
+      }
+    }
     fragment.appendChild(page);
   });
 
   printHandler.appendChild(fragment);
 
-  if (isSafari && !isChromeOniOS) {
+  if (isCordovaPrinter) {
+    const html = document.createElement('html');
+    html.style.width = '100%';
+    html.style.height = '100%';
+    html.style.padding = 0;
+    html.style.margin = 0;
+    const body = document.createElement('body');
+    body.style.width = '100%';
+    body.style.height = '100%';
+    body.style.padding = 0;
+    body.style.margin = 0;
+    body.appendChild(printHandler);
+    html.appendChild(body);
+    window.parent.cordova.plugins.printer.print(html, 'Document.html');
+  } else if (isSafari && !isChromeOniOS) {
     // Print for Safari browser. Makes Safari 11 consistently work.
     document.execCommand('print');
   } else {
