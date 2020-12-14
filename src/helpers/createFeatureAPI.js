@@ -216,6 +216,9 @@ export default (enable, store) => features => {
         }
       },
     },
+    [Feature.MathSymbols]: {
+      dataElements: ['mathSymbolsButton'],
+    },
   };
 
   if (!Array.isArray(features)) {

@@ -310,7 +310,7 @@ class ThumbnailsPanel extends React.PureComponent {
     const ctx = annotCanvas.getContext('2d');
 
     let zoom = 1;
-    let rotation = core.getCompleteRotation(pageNumber) - core.getRotation(pageNumber);
+    let rotation = core.getCompleteRotation(pageNumber);
     if (rotation < 0) {
       rotation += 4;
     }
@@ -437,7 +437,7 @@ class ThumbnailsPanel extends React.PureComponent {
     const allowPageOperationsUI = allowPageOperations && !isReaderMode;
 
     return (
-      <div className={className} key={key} style={style}>
+      <div role="row" aria-label="row" className={className} key={key} style={style}>
         {new Array(numberOfColumns).fill().map((_, columnIndex) => {
           const thumbIndex = index * numberOfColumns + columnIndex;
           const allowDragAndDrop =
@@ -445,7 +445,7 @@ class ThumbnailsPanel extends React.PureComponent {
           const showPlaceHolder = allowDragAndDrop && draggingOverPageIndex === thumbIndex;
 
           return thumbIndex < this.props.totalPages ? (
-            <div key={thumbIndex} onDragEnd={this.onDragEnd}>
+            <div role="cell" key={thumbIndex} onDragEnd={this.onDragEnd}>
               {showPlaceHolder && isDraggingToPreviousPage && (
                 <hr className="thumbnailPlaceholder" />
               )}

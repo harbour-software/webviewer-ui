@@ -8,9 +8,10 @@ import './Layer.scss';
 
 class Layer extends React.PureComponent {
   static propTypes = {
-    layer: PropTypes.object.isRequired,
+    layer: PropTypes.object,
     parentLayer: PropTypes.object,
-    updateLayer: PropTypes.func.isRequired,
+    updateLayer: PropTypes.func,
+    layerId: PropTypes.string,
   };
 
   state = {
@@ -22,7 +23,9 @@ class Layer extends React.PureComponent {
     const newLayer = { ...layer };
     layer.children && layer.children.forEach((childLayer, i) => {
       let newChildLayer = { ...childLayer };
-      newChildLayer.visible = false;
+      if (!newChildLayer.locked) {
+        newChildLayer.visible = false;
+      }
       newChildLayer = this.unCheckChildren(newChildLayer);
       newLayer.children[i] = newChildLayer;
     });
@@ -53,8 +56,12 @@ class Layer extends React.PureComponent {
 
   render() {
     const { isExpanded } = this.state;
-    const { layer, updateLayer } = this.props;
-    const hasSubLayers = layer.children.length > 0;
+    const { layer, updateLayer, layerId } = this.props;
+    // need unique layer id or else Input will not be toggled correctly if 2 layers have same name
+    if (!layer || !updateLayer || !layerId) {
+      return null;
+    }
+    const hasSubLayers = layer && layer.children && layer.children.length > 0;
 
     return (
       <div className="Layer">
@@ -72,12 +79,13 @@ class Layer extends React.PureComponent {
             )}
           </div>
           <Input
-            id={layer.name}
+            id={`layer-${layerId}`}
             type="checkbox"
             label={layer.name}
             onChange={this.onChange}
             checked={layer.visible}
-            dataElement={`${layer.name}LayerOption`}
+            disabled={layer.locked}
+            dataElement={`layer-${layerId}-LayerOption`}
           />
         </div>
         {hasSubLayers && isExpanded && (
@@ -87,13 +95,13 @@ class Layer extends React.PureComponent {
                 key={i}
                 layer={subLayer}
                 parentLayer={layer}
+                layerId={`${layerId}-${i}`}
                 updateLayer={modifiedSubLayer => {
                   // new references for redux state
                   const children = [...layer.children];
                   children[i] = modifiedSubLayer;
                   const newLayer = { ...layer };
                   newLayer.children = children;
-
                   updateLayer(newLayer);
                 }}
               />

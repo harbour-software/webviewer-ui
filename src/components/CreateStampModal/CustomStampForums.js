@@ -102,6 +102,8 @@ const CustomStampForums = ({ state, setState, closeModal, createCustomStamp }) =
     updateCanvas(stampTextInputValue, txt, colorInput);
   };
 
+  const stampInputLabel = t('option.customStampModal.stampText');
+
   return (
     <div className="text-customstamp">
 
@@ -115,11 +117,12 @@ const CustomStampForums = ({ state, setState, closeModal, createCustomStamp }) =
       </div>
 
       <div style={{ marginTop: 10, display: 'flex' }}>
-        <div className="stamp-label" style={{ width: '20%', alignSelf: 'center' }}> {t('option.customStampModal.stampText')} </div>
+        <div className="stamp-label" style={{ width: '20%', alignSelf: 'center' }}> {stampInputLabel} </div>
         <input
           className="text-customstamp-input"
           ref={inputRef}
           type="text"
+          aria-label={stampInputLabel.substring(0, stampInputLabel.length - 1)}
           value={stampTextInputValue}
           onChange={handleInputChange}
         />
@@ -146,18 +149,40 @@ const CustomStampForums = ({ state, setState, closeModal, createCustomStamp }) =
           label={t('option.customStampModal.Time')}
         />
       </div>
+      {
+        !stampTextInputValue
+        && (
+          <div className='empty-stamp-input'>
+            {t('message.emptyCustomStampInput')}
+          </div>
+        )
+      }
       <div className="divider-horizontal"></div>
       <div className="footer">
-        <div className="stamp-close" onClick={closeModal}>
+        <button className="stamp-close" onClick={closeModal}>
           {t('action.cancel')}
-        </div>
+        </button>
         <ColorPalette
           color={colorInput}
           property="StrokeColor"
           onStyleChange={handleColorInputChange}
           overridePalette2={COLOR_CHOICES}
         />
-        <div className="stamp-create" onClick={createCustomStamp}>
+        <div
+          className={
+            !stampTextInputValue
+              ? "stamp-create stamp-create-disabled"
+              : "stamp-create"
+          }
+          onClick={
+            () => {
+              if (!stampTextInputValue) {
+                return;
+              }
+              createCustomStamp();
+            }
+          }
+        >
           {t('action.create')}
         </div>
       </div>

@@ -1,75 +1,40 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-
+import { useTranslation } from 'react-i18next';
 import Icon from 'components/Icon';
 import Choice from '../Choice/Choice';
-
-import core from 'core';
-import actions from 'actions';
-import selectors from 'selectors';
-
-import { getOverrideSearchExecution } from "helpers/search";
-import searchTextFullFactory from '../../apis/searchTextFull';
-
-// Create searchTextFull without dispatch as redux is handled by the component
-const searchTextFull = searchTextFullFactory();
-
 import './SearchOverlay.scss';
 
 const propTypes = {
   isSearchOverlayDisabled: PropTypes.bool,
-  isWildCardSearchDisabled: PropTypes.bool,
   searchValue: PropTypes.string,
   isCaseSensitive: PropTypes.bool,
   isWholeWord: PropTypes.bool,
-  isSearchUp: PropTypes.bool,
-  isAmbientString: PropTypes.bool,
   isWildcard: PropTypes.bool,
-  isRegex: PropTypes.bool,
   searchResults: PropTypes.arrayOf(PropTypes.object),
   activeResultIndex: PropTypes.number,
   setSearchValue: PropTypes.func.isRequired,
-  resetSearch: PropTypes.func.isRequired,
   setCaseSensitive: PropTypes.func.isRequired,
   setWholeWord: PropTypes.func.isRequired,
   setWildcard: PropTypes.func.isRequired,
-  t: PropTypes.func.isRequired,
+  executeSearch: PropTypes.func.isRequired,
+  selectNextResult: PropTypes.func,
+  selectPreviousResult: PropTypes.func,
 };
 
 function SearchOverlay(props) {
-  const { isSearchOverlayDisabled, t, searchResults, activeResultIndex } = props;
-  const { searchValue, setSearchValue } = props;
+  const { t } = useTranslation();
+  const { isSearchOverlayDisabled, searchResults, activeResultIndex, selectNextResult, selectPreviousResult } = props;
+  const { searchValue, setSearchValue, executeSearch } = props;
   const { isCaseSensitive, setCaseSensitive, isWholeWord, setWholeWord, isWildcard, setWildcard } = props;
 
   const searchTextInputRef = React.useRef();
 
   React.useEffect(() => {
-    searchTextInputRef.current.focus();
-  }, []);
-
-  const executeSearch = React.useCallback(function executeSearchCallback(options = {}) {
-    const searchOptions = {
-      caseSensitive: isCaseSensitive,
-      wholeWord: isWholeWord,
-      wildcard: isWildcard,
-      regex: false,
-      ...options,
-    };
-    if (searchValue) {
-      if (searchTextInputRef.current) {
-        searchTextInputRef.current.blur();
-      }
-      // user can override search execution with instance.overrideSearchExecution()
-      // Here we check if user has done that and call that rather than default search execution
-      const overrideSearchExecution = getOverrideSearchExecution();
-      if (overrideSearchExecution) {
-        overrideSearchExecution(searchValue, searchOptions);
-      } else {
-        searchTextFull(searchValue, searchOptions);
-      }
+    if (searchTextInputRef.current) {
+      searchTextInputRef.current.focus();
     }
-  }, [searchValue, isCaseSensitive, isWholeWord, isWildcard]);
+  }, []);
 
   const textInputOnChange = React.useCallback(function textInputOnChangeCallback(event) {
     const searchValue = event.target.value;
@@ -77,44 +42,49 @@ function SearchOverlay(props) {
   }, [setSearchValue]);
 
   const textInputOnKeyDown = React.useCallback(function textInputOnKeyDownCallback(event) {
-    if (event.which === 13) { // Enter
-      executeSearch();
+    if (event.key === 'Enter') {
+      executeSearch(searchValue, {
+        caseSensitive: isCaseSensitive,
+        wholeWord: isWholeWord,
+        wildcard: isWildcard,
+      });
     }
-  }, [executeSearch]);
+  }, [executeSearch, searchValue, isCaseSensitive, isWholeWord, isWildcard]);
 
   const searchButtonOnClick = React.useCallback(function onSearchButtonClickCallback() {
-    executeSearch();
-  }, [executeSearch]);
+    executeSearch(searchValue, {
+      caseSensitive: isCaseSensitive,
+      wholeWord: isWholeWord,
+      wildcard: isWildcard,
+    });
+  }, [executeSearch, searchValue, isCaseSensitive, isWholeWord, isWildcard]);
 
   const caseSensitiveSearchOptionOnChange = React.useCallback(function caseSensitiveSearchOptionOnChangeCallback(event) {
     const isChecked = event.target.checked;
     setCaseSensitive(isChecked);
-  }, [setCaseSensitive]);
+  }, [searchValue, setCaseSensitive, isWholeWord, isWildcard]);
 
   const wholeWordSearchOptionOnChange = React.useCallback(function wholeWordSearchOptionOnChangeCallback(event) {
     const isChecked = event.target.checked;
     setWholeWord(isChecked);
-  }, [setWholeWord]);
+  }, [searchValue, setWholeWord, isCaseSensitive, isWildcard]);
 
   const wildcardOptionOnChange = React.useCallback(function wildcardOptionOnChangeCallback(event) {
     const isChecked = event.target.checked;
     setWildcard(isChecked);
-  }, [setWildcard]);
+  }, [searchValue, setWildcard, isCaseSensitive, isWholeWord]);
 
-  const nextButtonOnClick = React.useCallback(function nextButtonOnClickCallback(event) {
-    if (searchResults.length > 0) {
-      const nextResultIndex = activeResultIndex === searchResults.length - 1 ? 0 : activeResultIndex + 1;
-      core.setActiveSearchResult(searchResults[nextResultIndex]);
+  const nextButtonOnClick = React.useCallback(function nextButtonOnClickCallback() {
+    if (selectNextResult) {
+      selectNextResult(searchResults, activeResultIndex);
     }
-  }, [searchResults, activeResultIndex]);
+  }, [selectNextResult, searchResults, activeResultIndex]);
 
-  const previousButtonOnClick = React.useCallback(function previousButtonOnClickCallback(event) {
-    //event.preventDefault();
-    if (searchResults.length > 0) {
-      const prevResultIndex = activeResultIndex <= 0 ? searchResults.length - 1 : activeResultIndex - 1;
-      core.setActiveSearchResult(searchResults[prevResultIndex]);
+  const previousButtonOnClick = React.useCallback(function previousButtonOnClickCallback() {
+    if (selectPreviousResult) {
+      selectPreviousResult(searchResults, activeResultIndex);
     }
-  }, [searchResults, activeResultIndex]);
+  }, [selectPreviousResult, searchResults, activeResultIndex]);
 
 
   if (isSearchOverlayDisabled) {
@@ -192,31 +162,5 @@ function SearchOverlay(props) {
 
 SearchOverlay.propTypes = propTypes;
 
-const mapStateToProps = state => ({
-  isSearchOverlayDisabled: selectors.isElementDisabled(state, 'searchOverlay'),
-  searchValue: selectors.getSearchValue(state),
-  isCaseSensitive: selectors.isCaseSensitive(state),
-  isWholeWord: selectors.isWholeWord(state),
-  isAmbientString: selectors.isAmbientString(state),
-  isSearchUp: selectors.isSearchUp(state),
-  isWildcard: selectors.isWildcard(state),
-  isRegex: selectors.isRegex(state),
-});
+export default SearchOverlay;
 
-const mapDispatchToProps = {
-  closeElements: actions.closeElements,
-  setSearchValue: actions.setSearchValue,
-  resetSearch: actions.resetSearch,
-  setCaseSensitive: actions.setCaseSensitive,
-  setWholeWord: actions.setWholeWord,
-  setWildcard: actions.setWildcard,
-};
-
-function SearchOverlayRedux(props) {
-  return (<SearchOverlay {...props} />);
-}
-
-export default connect(
-  mapStateToProps,
-  mapDispatchToProps,
-)(SearchOverlayRedux);

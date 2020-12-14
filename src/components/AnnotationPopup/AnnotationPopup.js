@@ -126,7 +126,12 @@ const AnnotationPopup = () => {
           setTimeout(() => dispatch(actions.openElement('annotationNoteConnectorLine')), 300);
         }
       } else {
-        closeAndReset();
+        const actionOnOtherAnnotation = firstAnnotation && annotations && !annotations.includes(firstAnnotation);
+        if (action === 'deselected' && actionOnOtherAnnotation) {
+          return;
+        } else {
+          closeAndReset();
+        }
       }
     };
 
@@ -138,7 +143,7 @@ const AnnotationPopup = () => {
       core.removeEventListener('documentUnloaded', closeAndReset);
       window.addEventListener('resize', closeAndReset);
     };
-  }, [dispatch, isNotesPanelOpen]);
+  }, [dispatch, isNotesPanelOpen, firstAnnotation]);
 
   if (isDisabled || !firstAnnotation) {
     return null;
@@ -157,7 +162,8 @@ const AnnotationPopup = () => {
   const canUngroup = numberOfGroups === 1 && numberOfSelectedAnnotations > 1;
   const multipleAnnotationsSelected = numberOfSelectedAnnotations > 1;
 
-  const isFreeTextAndCanEdit = firstAnnotation instanceof window.Annotations.FreeTextAnnotation && core.getAnnotationManager().useFreeTextEditing();
+  const isFreeTextAnnot = firstAnnotation instanceof window.Annotations.FreeTextAnnotation;
+  const isFreeTextAndCanEdit = isFreeTextAnnot && core.getAnnotationManager().useFreeTextEditing() && core.canModifyContents(firstAnnotation);
 
   const commentOnAnnotation = () => {
     if (isFreeTextAndCanEdit) {
@@ -261,7 +267,7 @@ const AnnotationPopup = () => {
               onClick={() => core.ungroupAnnotations(selectedAnnotations)}
             />
           )}
-          {canModify && (
+          {canModify && !firstAnnotation.NoDelete && (
             <ActionButton
               dataElement="annotationDeleteButton"
               title="action.delete"
@@ -333,7 +339,7 @@ const AnnotationPopup = () => {
     isIE || isMobile() ?
       annotationPopup
       :
-      <Draggable cancel=".Button, .cell, .sliders-container svg">
+      <Draggable cancel=".Button, .cell, .sliders-container svg, select">
         {annotationPopup}
       </Draggable>
   );

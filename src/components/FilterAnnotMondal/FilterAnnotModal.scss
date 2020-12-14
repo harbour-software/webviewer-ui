@@ -120,11 +120,11 @@
 
         .filter-annot-clear {
           color: var(--secondary-button-text);
-          background: var(--secondary-button);
+          background: none;
 
           &:hover {
             color: var(--secondary-button-hover);
-            background: var(--secondary-button);
+            background: none;
           }
         }
 

@@ -77,7 +77,11 @@
 
         &::placeholder {
           color: var(--placeholder-text);
-        }
+        } 
+      }
+
+      .error {
+        border: 1px solid var(--error-border-color);
       }
 
       .unitToInput {
@@ -96,6 +100,14 @@
         &::placeholder {
           color: var(--placeholder-text);
         }
+      }
+
+      .errorMeasurement {
+        font-size: 13px;
+        margin-top: 8px;
+        margin-bottom: 8px;
+        color: var(--error-text-color);
+        max-width: 400px;
       }
     }
 

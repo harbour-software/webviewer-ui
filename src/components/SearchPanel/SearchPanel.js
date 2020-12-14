@@ -94,7 +94,6 @@ class SearchPanel extends React.PureComponent {
             </button>
           </div>}
         <SearchOverlay
-          t={t}
           searchResults={searchResults}
           activeResultIndex={activeSearchResultIndex}
         />

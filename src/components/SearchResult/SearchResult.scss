@@ -2,6 +2,7 @@
 
 .SearchResult {
   @include button-reset;
+  border: solid transparent 1px;
   display: block;
   width: calc(100% - 4px);
   text-align: left;
@@ -21,7 +22,7 @@
   }
 
   .search-value {
-    background: #face0080;
+    background: var(--yellow-1);
     word-break: break-all;
   }
 }

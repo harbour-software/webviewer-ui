@@ -3,9 +3,9 @@ import classNames from 'classnames';
 
 import './SignatureRowContent.scss';
 
-const SignatureRowContent = ({ onClick, imgSrc, isActive }) => {
+const SignatureRowContent = ({ onClick, imgSrc, isActive, altText }) => {
   return (
-    <div
+    <button
       className={classNames({
         "signature-row-content": true,
         "interactable": onClick,
@@ -13,8 +13,8 @@ const SignatureRowContent = ({ onClick, imgSrc, isActive }) => {
       })}
       onClick={onClick}
     >
-      <img src={imgSrc} />
-    </div>
+      <img alt={altText} src={imgSrc} />
+    </button>
   );
 };
 

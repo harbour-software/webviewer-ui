@@ -4,6 +4,7 @@ import useOnClickOutside from 'hooks/useOnClickOutside';
 import PropTypes from 'prop-types';
 import React, { useCallback, useRef, useState, useMemo } from 'react';
 import { useTranslation } from 'react-i18next';
+import DataElementWrapper from 'components/DataElementWrapper';
 import useArrowFocus from '../../hooks/useArrowFocus';
 import './Dropdown.scss';
 
@@ -14,25 +15,15 @@ const propTypes = {
   items: PropTypes.array.isRequired,
   currentSelectionKey: PropTypes.string.isRequired,
   translationPrefix: PropTypes.string.isRequired,
+  dataElement: PropTypes.string.isRequired,
 };
 
-function Dropdown({ items, currentSelectionKey, translationPrefix, onClickItem }) {
+function Dropdown({ items = [], currentSelectionKey, translationPrefix, onClickItem, dataElement }) {
   const  { t, ready: tReady } = useTranslation();
-
   const overlayRef = useRef(null);
   const buttonRef = useRef(null);
-
   const [isOpen, setIsOpen] = useState(false);
-
-  const [itemsWidth, setItemsWidth] = useState(DEFAULT_WIDTH);
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  // useLayoutEffect(() => {
-  //   // Default to always a number.
-  //   const clientWidth = (overlayRef.current && overlayRef.current.clientWidth) || DEFAULT_WIDTH;
-  //   if (clientWidth !== itemsWidth) {
-  //     setItemsWidth(overlayRef.current.clientWidth);
-  //   }
-  // });
+  const [itemsWidth] = useState(DEFAULT_WIDTH);
 
   const onClose = useCallback(() => setIsOpen(false), []);
   const onToggle = useCallback(() => setIsOpen(prev => !prev), []);
@@ -59,14 +50,16 @@ function Dropdown({ items, currentSelectionKey, translationPrefix, onClickItem }
   const dropdownItems = useMemo(
     () =>
       items.map(key => (
-        <button
+        <DataElementWrapper
           key={key}
+          type="button"
+          dataElement={`dropdown-item-${key}`}
           className={classNames('Dropdown__item', { active: key === currentSelectionKey })}
           onClick={e => onClickDropdownItem(e, key)}
           tabIndex={isOpen ? undefined : -1} // Just to be safe.
         >
           {t(`${translationPrefix}.${key}`, key)}
-        </button>
+        </DataElementWrapper>
       )),
     [currentSelectionKey, isOpen, items, onClickDropdownItem, t, translationPrefix],
   );
@@ -79,11 +72,13 @@ function Dropdown({ items, currentSelectionKey, translationPrefix, onClickItem }
   );
 
   return (
-    <div className="Dropdown__wrapper">
+    <DataElementWrapper
+      className="Dropdown__wrapper"
+      dataElement={dataElement}
+    >
       <button
         className="Dropdown"
         style={buttonStyle}
-        data-element="dropdown"
         onClick={onToggle}
         ref={buttonRef}
       >
@@ -99,10 +94,12 @@ function Dropdown({ items, currentSelectionKey, translationPrefix, onClickItem }
       <div
         className={classNames('Dropdown__items', { 'hide': !isOpen })}
         ref={overlayRef}
+        role="listbox"
+        aria-label={t(`${translationPrefix}.dropdownLabel`)}
       >
         {dropdownItems}
       </div>
-    </div>
+    </DataElementWrapper>
   );
 }
 

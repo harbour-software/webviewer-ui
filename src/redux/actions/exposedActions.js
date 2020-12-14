@@ -5,7 +5,12 @@ import { getMinZoomLevel, getMaxZoomLevel } from 'constants/zoomFactors';
 import {enableElements, disableElements} from 'actions/internalActions';
 
 import defaultTool from 'constants/defaultTool';
-import { PRIORITY_THREE, PRIORITY_TWO } from 'constants/actionPriority';
+import { PRIORITY_TWO } from 'constants/actionPriority';
+
+export const setHighContrastMode = useHighContrastMode => ({
+  type: 'SET_HIGH_CONTRAST_MODE',
+  payload: { useHighContrastMode },
+});
 
 export const setCanUndo = canUndo => ({
   type: 'SET_CAN_UNDO',
@@ -98,7 +103,7 @@ export const enableRibbons = () => (dispatch, getState) => {
 };
 
 const isElementDisabled = (state, dataElement) =>
-state.viewer.disabledElements[dataElement]?.disabled;
+  state.viewer.disabledElements[dataElement]?.disabled;
 
 export const allButtonsInGroupDisabled = (state, toolGroup) => {
   const dataElements = Object.values(state.viewer.toolButtonObjects)
@@ -177,13 +182,17 @@ export const setSelectedStampIndex = index => ({
   type: 'SET_SELECTED_STAMP_INDEX',
   payload: { index },
 });
-export const setSelectedSignatureIndex = index => ({
-  type: 'SET_SELECTED_SIGNATURE_INDEX',
+export const setSelectedDisplayedSignatureIndex = index => ({
+  type: 'SET_SELECTED_DISPLAYED_SIGNATURE_INDEX',
   payload: { index },
 });
 export const setSavedSignatures = savedSignatures => ({
   type: 'SET_SAVED_SIGNATURES',
   payload: { savedSignatures },
+});
+export const setDisplayedSignaturesFilterFunction = filterFunction => ({
+  type: 'SET_DISPLAYED_SIGNATURES_FILTER_FUNCTION',
+  payload: { filterFunction },
 });
 export const setLeftPanelWidth = width => ({
   type: 'SET_LEFT_PANEL_WIDTH',

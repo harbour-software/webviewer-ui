@@ -9,6 +9,7 @@ import core from 'core';
 import { mapAnnotationToKey } from 'constants/map';
 import setToolStyles from 'helpers/setToolStyles';
 import parseMeasurementContents from 'helpers/parseMeasurementContents';
+import evalFraction from 'helpers/evalFraction';
 import actions from 'actions';
 import selectors from 'selectors';
 
@@ -17,6 +18,8 @@ import { Swipeable } from 'react-swipeable';
 import './CalibrationModal.scss';
 
 const numberRegex = /^\d*(\.\d*)?$/;
+const fractionRegex = /^\d*(\s\d\/\d*)$/;
+const pureFractionRegex = /^(\d\/\d*)*$/;
 
 const CalibrationModal = () => {
   const [isOpen, isDisabled, units] = useSelector(
@@ -30,7 +33,9 @@ const CalibrationModal = () => {
   const dispatch = useDispatch();
   const [annotation, setAnnotation] = useState(null);
   const [value, setValue] = useState('');
+  const [newDistance, setNewDistance] = useState(0);
   const [unitTo, setUnitTo] = useState('');
+  const [showError, setShowError] = useState(false);
   const [t] = useTranslation();
 
   useEffect(() => {
@@ -42,12 +47,17 @@ const CalibrationModal = () => {
       ) {
         const annot = annotations[0];
         setAnnotation(annot);
-        setValue(parseMeasurementContents(annot.getContents()));
+        const value = parseMeasurementContents(annot.getContents());
+        setValue(value);
         setUnitTo(annot.Scale[1][1]);
+        // initial new distance should be the same as the value
+        // in case the user doesn't change the input value
+        setNewDistance(parseFloat(value));
       } else if (action === 'deselected') {
         setAnnotation(null);
         setValue('');
         setUnitTo('');
+        setNewDistance(0);
       }
     };
 
@@ -74,8 +84,34 @@ const CalibrationModal = () => {
   }, [annotation]);
 
   const handleInputChange = e => {
-    if (numberRegex.test(e.target.value)) {
-      setValue(e.target.value);
+    setShowError(false);
+    setValue(e.target.value);
+  };
+
+  const validateInput = e => {
+    const inputValue = e.target.value.trim();
+    if (numberRegex.test(inputValue)) {
+      setNewDistance(parseFloat(inputValue));
+      setValue(inputValue);
+    } else if (fractionRegex.test(inputValue)) {
+      const [whole, fraction] = inputValue.split(' ');
+      if (Number.isFinite(evalFraction(fraction))) {
+        const number = Number(whole) + evalFraction(fraction);
+        setNewDistance(parseFloat(number));
+        setValue(number);
+      } else {
+        setShowError(true);
+      }
+    } else if (pureFractionRegex.test(inputValue)) {
+      if (Number.isFinite(evalFraction(inputValue))) {
+        const number = evalFraction(inputValue);
+        setNewDistance(parseFloat(number));
+        setValue(number);
+      } else {
+        setShowError(true);
+      }
+    } else {
+      setShowError(true);
     }
   };
 
@@ -85,49 +121,33 @@ const CalibrationModal = () => {
 
   const handleApply = () => {
     const newScale = getNewScale();
+    const accurateNewScale = handleLossOfPrecision(newScale);
 
-    handleLossOfPrecision(newScale).then(accurateNewScale => {
-      core.setAnnotationStyles(annotation, {
-        Scale: accurateNewScale,
-      });
-
-      // this will also set the Scale for the other two measurement tools
-      setToolStyles(
-        'AnnotationCreateDistanceMeasurement',
-        'Scale',
-        accurateNewScale
-      );
-
-      dispatch(actions.closeElements(['calibrationModal']));
+    core.setAnnotationStyles(annotation, {
+      Scale: accurateNewScale,
     });
+
+    // this will also set the Scale for the other two measurement tools
+    setToolStyles(
+      'AnnotationCreateDistanceMeasurement',
+      'Scale',
+      accurateNewScale
+    );
+
+    dispatch(actions.closeElements(['calibrationModal']));
   };
 
   const handleLossOfPrecision = scale => {
-    return new Promise(resolve => {
-      const annotManager = core.getAnnotationManager();
+    // when the new distance that's entered in the modal is much bigger than the current distance, loss of precision can happen
+    // because internally WebViewer will do several multiplications and divisions to get the value to store in a measure dictionary
+    // in this case, setting 'Scale' again should fix this issue because this time the new distance and the current distance is very close, and we should get the accurate scale
+    annotation.Scale = scale;
 
-      annotManager.one('annotationChanged', (annotations, action) => {
-        if (
-          action === 'modify' &&
-          annotations.length === 1 &&
-          annotations[0] === annotation
-        ) {
-          const newScale = getNewScale();
-          resolve(newScale);
-        }
-      });
-      // when the new distance that's entered in the modal is much bigger than the current distance, loss of precision can happen
-      // because internally WebViewer will do several multiplications and divisions to get the value to store in a measure dictionary
-      // in this case, setting 'Scale' again should fix this issue because this time the new distance and the current distance is very close, and we should get the accurate scale
-      core.setAnnotationStyles(annotation, {
-        Scale: scale,
-      });
-    });
+    return getNewScale();
   };
 
   const getNewScale = () => {
     const currentDistance = parseMeasurementContents(annotation.getContents());
-    const newDistance = parseFloat(value);
     const ratio = newDistance / currentDistance;
 
     const currentScale = annotation.Scale;
@@ -166,7 +186,7 @@ const CalibrationModal = () => {
           <div className="calibration__body">
             <div>{t('message.enterMeasurement')}</div>
             <div className="calibration__input">
-              <input type="text" value={value} onChange={handleInputChange} />
+              <input className={showError ? 'error' : ''} type="text" value={value} onChange={handleInputChange} onBlur={validateInput}/>
               <select
                 className="unitToInput"
                 value={unitTo}
@@ -179,12 +199,14 @@ const CalibrationModal = () => {
                 ))}
               </select>
             </div>
+            {showError ? <div className="errorMeasurement">{t('message.errorEnterMeasurement')}</div> : null}
           </div>
           <div className="calibration__footer">
             <Button
               dataElement="passwordSubmitButton"
               label={t('action.apply')}
               onClick={handleApply}
+              disabled={showError}
             />
           </div>
         </div>

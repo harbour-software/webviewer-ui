@@ -8,10 +8,12 @@ import defaultTool from 'constants/defaultTool';
 
 import core from 'core';
 import getToolStyles from 'helpers/getToolStyles';
+import getFillClass from 'helpers/getFillClass';
 import { mapToolNameToKey } from 'constants/map';
 import actions from 'actions';
 import selectors from 'selectors';
 import useMedia from 'hooks/useMedia';
+import DataElementWrapper from 'components/DataElementWrapper';
 
 import './ToolGroupButton.scss';
 
@@ -25,8 +27,8 @@ class ToolGroupButton extends React.PureComponent {
     title: PropTypes.string,
     toolNames: PropTypes.arrayOf(PropTypes.string),
     toolButtonObjects: PropTypes.object,
+    lastPickedToolForGroup: PropTypes.string,
     allButtonsInGroupDisabled: PropTypes.bool,
-    isToolGroupButtonDisabled: PropTypes.bool,
     openElement: PropTypes.func.isRequired,
     toggleElement: PropTypes.func.isRequired,
     closeElement: PropTypes.func.isRequired,
@@ -71,7 +73,6 @@ class ToolGroupButton extends React.PureComponent {
       mediaQueryClassName,
       dataElement,
       toolButtonObjects,
-      isToolGroupButtonDisabled,
       allButtonsInGroupDisabled,
       iconColorKey,
       showColor,
@@ -88,20 +89,16 @@ class ToolGroupButton extends React.PureComponent {
       if (iconColorKey) {
         color = toolStyles[iconColorKey]?.toHexString?.();
       }
-      fillClass = (toolStyles.FillColor?.toHexString() || '').substring(1);
-      if (fillClass) {
-        fillClass = `F-${fillClass}`;
-      }
+      fillClass = getFillClass(toolStyles.FillColor);
     }
 
-    return (isToolGroupButtonDisabled || allButtonsInGroupDisabled) ? null : (
-      <div
+    return allButtonsInGroupDisabled ? null : (
+      <DataElementWrapper
         className={classNames({
           'tool-group-button': true,
           active: isActive,
         })}
-        data-element={dataElement}
-        onClick={this.onClick}
+        dataElement={dataElement}
       >
         <Button
           title={title}
@@ -110,8 +107,10 @@ class ToolGroupButton extends React.PureComponent {
           img={img}
           color={color}
           fillClass={fillClass}
+          dataElement={dataElement}
+          onClick={this.onClick}
         />
-      </div>
+      </DataElementWrapper>
     );
   }
 }
@@ -123,7 +122,6 @@ const mapStateToProps = (state, ownProps) => ({
   activeToolName: selectors.getActiveToolName(state),
   toolNames: selectors.getToolNamesByGroup(state, ownProps.toolGroup),
   toolButtonObjects: selectors.getToolButtonObjects(state),
-  isToolGroupButtonDisabled: selectors.isElementDisabled(state, ownProps.dataElement),
   allButtonsInGroupDisabled: selectors.allButtonsInGroupDisabled(state, ownProps.toolGroup),
   iconColorKey: selectors.getIconColor(
     state,

@@ -237,7 +237,7 @@ class PrintModal extends React.PureComponent {
       >
         <>
           <WatermarkModal
-            isVisible={this.state.isWatermarkModalVisible}
+            isVisible={isOpen && this.state.isWatermarkModalVisible}
             // pageIndex starts at index 0 and getCurrPage number starts at index 1
             pageIndexToView={this.props.currentPage - 1}
             modalClosed={this.setWatermarkModalVisibility}
@@ -323,11 +323,13 @@ class PrintModal extends React.PureComponent {
                   </form>
                   <div>
                     <div className="col">
-                      <div>{`${t('option.print.pageQuality')}:`}</div>
-                      <select className="printQualitySelect" onChange={e => this.props.setPrintQuality(Number(e.target.value))} value={this.props.printQuality}>
-                        <option value="2">{`${t('option.print.qualityHigh')}`}</option>
-                        <option value="1">{`${t('option.print.qualityNormal')}`}</option>
-                      </select>
+                      <label>
+                        {`${t('option.print.pageQuality')}:`}
+                        <select className="printQualitySelect" onChange={e => this.props.setPrintQuality(Number(e.target.value))} value={this.props.printQuality}>
+                          <option value="2">{`${t('option.print.qualityHigh')}`}</option>
+                          <option value="1">{`${t('option.print.qualityNormal')}`}</option>
+                        </select>
+                      </label>
                     </div>
                   </div>
                   <div className="total">

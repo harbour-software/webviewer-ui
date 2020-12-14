@@ -2,6 +2,11 @@ export default initialState => (state = initialState, action) => {
   const { type, payload } = action;
 
   switch (type) {
+    case 'SET_HIGH_CONTRAST_MODE':
+      return {
+        ...state,
+        highContrastMode: payload.useHighContrastMode,
+      };
     case 'SET_CAN_UNDO':
       return {
         ...state,
@@ -30,10 +35,10 @@ export default initialState => (state = initialState, action) => {
         ...state,
         selectedStampIndex: payload.index,
       };
-    case 'SET_SELECTED_SIGNATURE_INDEX':
+    case 'SET_SELECTED_DISPLAYED_SIGNATURE_INDEX':
       return {
         ...state,
-        selectedSignatureIndex: payload.index,
+        selectedDisplayedSignatureIndex: payload.index,
       };
     case 'SET_STANDARD_STAMPS':
       return {
@@ -343,6 +348,8 @@ export default initialState => (state = initialState, action) => {
       return { ...state, isSnapModeEnabled: payload.enable };
     case 'SET_READER_MODE':
       return { ...state, isReaderMode: payload.isReaderMode };
+    case 'SET_DISPLAYED_SIGNATURES_FILTER_FUNCTION':
+      return { ...state, displayedSignaturesFilterFunction: payload.filterFunction };
     default:
       return state;
   }

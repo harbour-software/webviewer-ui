@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classNames from 'classnames';
 
 import './Icon.scss';
 
@@ -27,7 +28,7 @@ class Icon extends React.PureComponent {
 
   updateSvg() {
     if (this.isInlineSvg()) {
-      var domElement = this.icon.current;
+      const domElement = this.icon.current;
 
       // remove existing svg
       while (domElement.firstChild) {
@@ -46,7 +47,7 @@ class Icon extends React.PureComponent {
   }
 
   render() {
-    const { className = '', color, glyph, fillClass = '' } = this.props;
+    const { className = '', color, glyph, fillClass = '', disabled } = this.props;
     const filter = (color && (color === 'rgba(255, 255, 255, 1)' || color === 'rgb(255, 255, 255)')) ? 'drop-shadow(0 0 .5px #333)' : undefined;
     let svgElement;
 
@@ -56,11 +57,24 @@ class Icon extends React.PureComponent {
       svgElement = undefined;
     }
 
+    const style = {
+      filter
+    };
+
+    if (!disabled) {
+      style.color = (color === 'rgba(0, 0, 0, 0)') ? '#808080' : color
+    }
+
     return (
       <div
         ref={this.icon}
-        className={`Icon ${className} ${fillClass}`}
-        style={{ color: (color === 'rgba(0, 0, 0, 0)') ? '#808080' : color, filter }}
+        className={classNames({
+          Icon: true,
+          [className]: true,
+          [fillClass]: true,
+          disabled,
+        })}
+        style={style}
         dangerouslySetInnerHTML={{ __html: svgElement }}
       />
     );

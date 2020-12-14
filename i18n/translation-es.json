@@ -133,6 +133,8 @@
     "redaction": "Modificación",
     "viewControlsOverlay": "Ver controles",
     "calibration": "Calibración",
+    "zoomOverlay": "Superposición de zoom",
+    "textPopup": "Ventana emergente de texto",
     "createStampButton": "Crear nuevo sello",
     "filter": "Filtrar"
   },
@@ -164,12 +166,15 @@
     "insertTextHere": "Inserta el texto aquí",
     "imageSignatureAcceptedFileTypes": "Solo se aceptan {{acceptFileTypes}}",
     "enterMeasurement": "Ingrese la medición entre los dos puntos",
+    "errorEnterMeasurement": "El número que ingresó no es válido, puede ingresar valores como 7.5 o 7 1/2",
     "linkURLorPage": "URL de enlace o una página",
     "enterReplacementText": "Ingrese el texto que desea reemplazar",
-    "sortBy": "Ordenar por"
+    "sortBy": "Ordenar por",
+    "emptyCustomStampInput": "El texto del sello no puede estar vacío"
   },
   "option": {
     "notesOrder": {
+      "dropdownLabel": "Lista de orden de clasificación",
       "position": "Posición",
       "time": "Hora",
       "status": "Estado",
@@ -177,6 +182,7 @@
       "type": "Tipo"
     },
     "toolbarGroup": {
+      "dropdownLabel": "Grupos de barras de herramientas",
       "toolbarGroup-View": "Ver",
       "toolbarGroup-Annotate": "Anotar",
       "toolbarGroup-Shapes": "Formas",
@@ -188,6 +194,9 @@
       "StrokeColor": "Color del borde",
       "FillColor": "Color de relleno",
       "TextColor": "Color del texto"
+    },
+    "colorPalette": {
+      "colorLabel": "Color"
     },
     "displayMode": {
       "layout": "Diseño",
@@ -230,6 +239,11 @@
       "caseSensitive": "Distinguir mayúsculas de minúsculas",
       "wholeWordOnly": "Palabra completa",
       "wildcard": "Comodín"
+    },
+    "toolsOverlay": {
+      "currentStamp": "Sello Actual",
+      "currentSignature": "Firma Actual",
+      "signatureAltText": "Firma"
     },
     "stampOverlay": {
       "addStamp": "Agregar nuevo sello"
@@ -373,7 +387,7 @@
     "richText": {
       "bold": "(Ctrl B)",
       "italic": "(Ctrl I)",
-      "underline": "(Ctrl L)",
+      "underline": "(Ctrl U)",
       "strikeout": "(Ctrl K)"
     }
   },

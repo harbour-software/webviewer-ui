@@ -23,6 +23,8 @@ import mentionsManager from 'helpers/MentionsManager';
 import getLatestActivityDate from 'helpers/getLatestActivityDate';
 import { mapAnnotationToKey, getDataWithKey } from 'constants/map';
 import escapeHtml from 'helpers/escapeHtml';
+import getFillClass from 'helpers/getFillClass';
+import getLatestActivityDate from 'helpers/getLatestActivityDate';
 import useDidUpdate from 'hooks/useDidUpdate';
 import actions from 'actions';
 import selectors from 'selectors';
@@ -122,18 +124,19 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
 
   const icon = getDataWithKey(mapAnnotationToKey(annotation)).icon;
   const color = annotation[iconColor]?.toHexString?.();
+  const fillClass = getFillClass(annotation.FillColor);
   const contents = annotation.getContents();
   const numberOfReplies = annotation.getReplies().length;
   const formatNumberOfReplies = Math.min(numberOfReplies, 9);
   // This is the text placeholder passed to the ContentArea
   // It ensures that if we try and edit, we get the right placeholder
   // depending on whether the comment has been saved to the annotation or not
-  const thereIsNoUnpostedEdit = typeof pendingEditTextMap[annotation.Id] === 'undefined'
+  const thereIsNoUnpostedEdit = typeof pendingEditTextMap[annotation.Id] === 'undefined';
   let textAreaValue;
   if (contents && thereIsNoUnpostedEdit) {
     textAreaValue = contents;
   } else {
-    textAreaValue = pendingEditTextMap[annotation.Id]
+    textAreaValue = pendingEditTextMap[annotation.Id];
   }
 
   const header = useMemo(() => (
@@ -144,7 +147,7 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
             <div className="num-replies-container">
               <div className="num-replies">{formatNumberOfReplies}</div>
             </div>}
-          <Icon className="type-icon" glyph={icon} color={color} />
+          <Icon className="type-icon" glyph={icon} color={color} fillClass={fillClass} />
         </div>
       }
       <div className="author-and-date">
@@ -210,17 +213,17 @@ const ContentArea = ({
   textAreaValue,
   onTextAreaValueChange,
 }) => {
-  const [isMentionEnabled] = useSelector(state => [
+  const [isMentionEnabled, isNotesPanelOpen] = useSelector(state => [
     selectors.getIsMentionEnabled(state),
+    selectors.isElementOpen(state, 'notesPanel'),
   ]);
   const [t] = useTranslation();
   const textareaRef = useRef();
 
   useEffect(() => {
     // on initial mount, focus the last character of the textarea
-    if (textareaRef.current) {
+    if (isNotesPanelOpen && textareaRef.current) {
       textareaRef.current.focus();
-
       const textLength = textareaRef.current.value.length;
       textareaRef.current.setSelectionRange(textLength, textLength);
     }
@@ -247,7 +250,7 @@ const ContentArea = ({
     }
 
     setIsEditing(false, noteIndex);
-    onTextAreaValueChange(undefined, annotation.Id)
+    onTextAreaValueChange(undefined, annotation.Id);
   };
 
   return (

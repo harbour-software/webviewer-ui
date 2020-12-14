@@ -1,8 +1,8 @@
-import React, { useEffect, useContext, useState, useCallback } from 'react';
-import NoteContext from 'components/Note/Context';
-import { useSelector, shallowEqual } from 'react-redux';
+import React, { useEffect, useState, useCallback } from 'react';
+import { useSelector, shallowEqual, useDispatch } from 'react-redux';
 import core from 'core';
 import selectors from 'selectors';
+import actions from 'actions';
 import { createPortal } from 'react-dom';
 import { getAnnotationPosition } from '../../helpers/getPopupPosition';
 
@@ -21,7 +21,6 @@ const LineConnectorPortal = ({ children }) => {
   return createPortal(children, el);
 };
 
-
 const AnnotationNoteConnectorLine = ({ annotation, noteContainerRef }) => {
   const [notePanelWidth, lineIsOpen, notePanelIsOpen, isLineDisabled, documentContainerWidth, documentContainerHeight] = useSelector(
     state => [
@@ -35,6 +34,8 @@ const AnnotationNoteConnectorLine = ({ annotation, noteContainerRef }) => {
     shallowEqual,
   );
 
+  const dispatch = useDispatch();
+
   //Right Horizontal Line
   const [rightHorizontalLineWidth, setRightHorizontalLineWidth] = useState(0);
   const [rightHorizontalLineTop, setRightHorizontalLineTop] = useState(0);
@@ -45,16 +46,15 @@ const AnnotationNoteConnectorLine = ({ annotation, noteContainerRef }) => {
   const [leftHorizontalLineTop, setLeftHorizontalLineTop] = useState(0);
   const [leftHorizontalLineRight, setLeftHorizontalLineRight] = useState(0);
 
-  const { isSelected: noteIsSelected } = useContext(NoteContext);
   const { bottomRight: annotationBottomRight, topLeft: annotationTopLeft } = getAnnotationPosition(annotation);
 
-  const getAnnotationLineOffset = useCallback(()=>{
-    if(annotation.Subject === 'Note'){
+  const getAnnotationLineOffset = useCallback(() => {
+    if (annotation.Subject === 'Note') {
       return 4;
     }
     return 15;
-  },[annotation]) 
-  
+  }, [annotation]);
+
   useEffect(() => {
     const { scrollTop, scrollLeft } = core.getScrollViewElement();
     const notePanelLeftPadding = 16;
@@ -74,9 +74,19 @@ const AnnotationNoteConnectorLine = ({ annotation, noteContainerRef }) => {
 
     setLeftHorizontalLineTop(annotationTopLeft.y + (annotHeightInPixels / 2) - scrollTop);
 
-  }, [noteContainerRef, notePanelWidth, annotationBottomRight, annotationTopLeft]);
+    const onPageNumberUpdated = () => {
+      dispatch(actions.closeElement('annotationNoteConnectorLine'))
+    }
 
-  if (noteIsSelected && lineIsOpen && notePanelIsOpen && !isLineDisabled) {
+    core.addEventListener('pageNumberUpdated', onPageNumberUpdated);
+
+    return () => {
+      core.removeEventListener('pageNumberUpdated', onPageNumberUpdated);
+    };
+
+  }, [noteContainerRef, notePanelWidth, annotationBottomRight, annotationTopLeft, documentContainerWidth, documentContainerHeight, dispatch]);
+
+  if (lineIsOpen && notePanelIsOpen && !isLineDisabled) {
     const verticalHeight = Math.abs(rightHorizontalLineTop - leftHorizontalLineTop);
     const horizontalLineHeight = 2;
     // Add HorizontalLineHeight of 2px when annot is above note to prevent little gap between lines
@@ -84,10 +94,10 @@ const AnnotationNoteConnectorLine = ({ annotation, noteContainerRef }) => {
 
     return (
       <LineConnectorPortal>
-        <div className="horizontalLine" style={{ width: rightHorizontalLineWidth, right: rightHorizontalLineRight, top: rightHorizontalLineTop }}/>
-        <div className="verticalLine" style={{ height: verticalHeight, top: verticalTop, right: rightHorizontalLineRight +  rightHorizontalLineWidth }}/>
+        <div className="horizontalLine" style={{ width: rightHorizontalLineWidth, right: rightHorizontalLineRight, top: rightHorizontalLineTop }} />
+        <div className="verticalLine" style={{ height: verticalHeight, top: verticalTop, right: rightHorizontalLineRight + rightHorizontalLineWidth }} />
         <div className="horizontalLine" style={{ width: leftHorizontalLineWidth, right: leftHorizontalLineRight, top: leftHorizontalLineTop }}>
-             <div className="arrowHead"  />
+          <div className="arrowHead" />
         </div>
       </LineConnectorPortal>);
   } else {

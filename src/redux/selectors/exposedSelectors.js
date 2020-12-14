@@ -1,6 +1,7 @@
 import { isChrome, isAndroid } from 'helpers/device';
 
 // viewer
+export const getIsHighContrastMode = state => state.viewer.highContrastMode;
 export const getLastPickedToolForGroup = (state, group) => state.viewer.lastPickedToolForGroup[group];
 export const getStandardStamps = state => state.viewer.standardStamps;
 export const getCustomStamps = state => state.viewer.customStamps;
@@ -11,14 +12,16 @@ export const getSelectedStamp = state => {
   const index = getSelectedStampIndex(state);
   let selectedStamp = standardStamps[index];
   // selected stamp is not found in standard stamps, search dyamic stamps
-  if (!selectedStamp && standardStamps.length) {
+  if (!selectedStamp && !!customStamps.length) {
     selectedStamp = customStamps[index - standardStamps.length];
   }
   return selectedStamp;
 };
 export const getSavedSignatures = state => state.viewer.savedSignatures;
-export const getSelectedSignatureIndex = state => state.viewer.selectedSignatureIndex;
-export const getSelectedSignature = state => getSavedSignatures(state)[getSelectedSignatureIndex(state)];
+export const getDisplayedSignatures = state => state.viewer.savedSignatures.filter(state.viewer.displayedSignaturesFilterFunction);
+export const getSelectedDisplayedSignatureIndex = state => state.viewer.selectedDisplayedSignatureIndex;
+export const getSelectedDisplayedSignature = state => getDisplayedSignatures(state)[getSelectedDisplayedSignatureIndex(state)];
+export const getDisplayedSignaturesFilterFunction = state => state.viewer.displayedSignaturesFilterFunction;
 
 export const getNotesInLeftPanel = state =>
   state.viewer.notesInLeftPanel;
@@ -33,12 +36,40 @@ export const getDocumentContainerWidth = state =>
 export const getDocumentContainerHeight = state =>
   state.viewer.documentContainerHeight;
 
+const RESIZE_BAR_WIDTH = 14; // 14px Need to update this if styling results in a change to width.
+export const getLeftPanelWidthWithReszieBar = state =>
+  state.viewer.panelWidths.leftPanel + RESIZE_BAR_WIDTH;
+export const getSearchPanelWidthWithReszieBar = state =>
+  state.viewer.panelWidths.searchPanel + RESIZE_BAR_WIDTH;
+export const getNotesPanelWidthWithReszieBar = state =>
+  state.viewer.panelWidths.notesPanel + RESIZE_BAR_WIDTH;
+export const getDocumentContentContainerWidthStyle = state => {
+  const notesPanelWidth = getNotesPanelWidthWithReszieBar(state);
+  const searchPanelWidth = getSearchPanelWidthWithReszieBar(state);
+  const leftPanelWidth = getLeftPanelWidthWithReszieBar(state);
+  const isLeftPanelOpen = isElementOpen(state, 'leftPanel');
+  const isNotesPanelOpen = isElementOpen(state, 'notesPanel');
+  const isSearchPanelOpen = isElementOpen(state, 'searchPanel');
+
+  const spaceTakenUpByPanels = 0 +
+    (isLeftPanelOpen ? leftPanelWidth : 0) +
+    (isNotesPanelOpen ? notesPanelWidth : 0) +
+    (isSearchPanelOpen ? searchPanelWidth : 0);
+
+  return `calc(100% - ${spaceTakenUpByPanels}px)`;
+};
+
+export const getDocumentContainerWidth = state =>
+  state.viewer.documentContainerWidth;
+export const getDocumentContainerHeight = state =>
+  state.viewer.documentContainerHeight;
+
 export const isElementDisabled = (state, dataElement) =>
-  state.viewer.disabledElements[dataElement]?.disabled;
+  state.viewer?.disabledElements[dataElement]?.disabled;
 
 export const isElementOpen = (state, dataElement) =>
-  state.viewer.openElements[dataElement] &&
-  !state.viewer.disabledElements[dataElement]?.disabled;
+  state.viewer?.openElements[dataElement] &&
+  !state.viewer?.disabledElements[dataElement]?.disabled;
 
 export const allButtonsInGroupDisabled = (state, toolGroup) => {
   const toolButtonObjects = getToolButtonObjects(state);

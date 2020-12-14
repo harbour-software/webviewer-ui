@@ -39,17 +39,6 @@ const TextSignature = ({
     }
   }, [activeIndex, fonts]);
 
-  const setSignature = useCallback(() => {
-    const signatureTool = core.getTool('AnnotationCreateSignature');
-    const canvas = canvasRef.current;
-
-    if (value) {
-      signatureTool.setSignature(canvas.toDataURL());
-    } else {
-      signatureTool.setSignature(null);
-    }
-  }, [value]);
-
   useEffect(() => {
     const canvas = canvasRef.current;
     const ctx = canvas.getContext('2d');
@@ -84,13 +73,13 @@ const TextSignature = ({
       drawTextSignature();
       setSignature();
     }
-  }, [activeIndex, isTabPanelSelected, value, fonts, setSignature]);
+  }, [activeIndex, isTabPanelSelected, value, fonts]);
 
   useEffect(() => {
     if (isModalOpen && isTabPanelSelected) {
       setSignature();
     }
-  }, [isModalOpen, isTabPanelSelected, setSignature]);
+  }, [isModalOpen, isTabPanelSelected]);
 
   useEffect(() => {
     if (isTabPanelSelected) {
@@ -104,22 +93,37 @@ const TextSignature = ({
     }
   }, [isTabPanelSelected]);
 
+  const setSignature = () => {
+    const signatureTool = core.getTool('AnnotationCreateSignature');
+    const canvas = canvasRef.current;
+
+    const signatureValue = value || '';
+    if (signatureValue.trim()) {
+      signatureTool.setSignature(canvas.toDataURL());
+    } else {
+      signatureTool.setSignature(null);
+    }
+  };
+
   const handleInputChange = e => {
-    const value = e.target.value;
+    // Use regex instead of 'trimStart' for IE11 compatibility
+    const value = e.target.value.replace(/^\s+/g, '');
     setValue(value);
   };
 
   return (
     <React.Fragment>
       <div className="text-signature">
-        <input
-          className="text-signature-input"
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={handleInputChange}
-        />
-        {/* <div className="text-signature-container"> */}
+        <label>
+          <input
+            className="text-signature-input"
+            ref={inputRef}
+            type="text"
+            value={value}
+            onChange={handleInputChange}
+            disabled={!(isModalOpen && isTabPanelSelected)}
+          />
+        </label>
         {fonts.map((font, index) => (
           <div
             key={font}
@@ -141,17 +145,16 @@ const TextSignature = ({
           </div>
         ))}
         <canvas ref={canvasRef} />
-        {/* </div> */}
       </div>
       <div
         className="footer"
       >
-        <div className="signature-clear" onClick={() => setValue('')}>
+        <button className="signature-clear" onClick={() => setValue('')} disabled={!(isModalOpen && isTabPanelSelected)}>
           {t('action.clear')}
-        </div>
-        <div className="signature-create" onClick={createSignature}>
+        </button>
+        <button className="signature-create" onClick={createSignature} disabled={!(isModalOpen && isTabPanelSelected)}>
           {t('action.create')}
-        </div>
+        </button>
       </div>
     </React.Fragment>
   );

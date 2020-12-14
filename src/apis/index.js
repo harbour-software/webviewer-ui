@@ -89,6 +89,8 @@ import setAdminUser from './setAdminUser';
 import setAnnotationUser from './setAnnotationUser';
 import setActivePalette from './setActivePalette';
 import setColorPalette from './setColorPalette';
+import setHighContrastMode from './setHighContrastMode';
+import getIsHighContrastMode from './getIsHighContrastMode';
 import setCurrentPageNumber from './setCurrentPageNumber';
 import setCustomModal from './setCustomModal';
 import setCustomNoteFilter from './setCustomNoteFilter';
@@ -130,6 +132,7 @@ import updateOutlines from './updateOutlines';
 import updateTool from './updateTool';
 import useEmbeddedPrint from './useEmbeddedPrint';
 import useNativeScroll from './useNativeScroll';
+import setDisplayedSignaturesFilterFunction from './setDisplayedSignaturesFilterFunction';
 import setMeasurementUnits from './setMeasurementUnits';
 import setMaxSignaturesCount from './setMaxSignaturesCount';
 import setSignatureFonts from './setSignatureFonts';
@@ -145,6 +148,35 @@ import setActiveResult from './setActiveResult';
 import setAnnotationContentOverlayHandler from './setAnnotationContentOverlayHandler';
 import overrideSearchExecution from "./overrideSearchExecution";
 import reactElements from './reactElements';
+import toggleReaderMode from './toggleReaderMode';
+
+/**
+ * Triggered when the UI theme is changed
+ * @name WebViewerInstance#themeChanged
+ * @event
+ * @example
+ // Listening to this event
+  WebViewer(...).then(function(instance) {
+    instance.iframeWindow.addEventListener('themeChanged', e => {
+      const theme = e.detail;
+      console.log(theme);
+    })
+  });
+ */
+
+/**
+ * Triggered when the panels are resized
+ * @name WebViewerInstance#panelResized
+ * @event
+ * @example
+ // Listening to this event
+  WebViewer(...).then(function(instance) {
+    instance.iframeWindow.addEventListener('panelResized', e => {
+      const { element, width } = e.detail;
+      console.log(element, width);
+    })
+  });
+ */
 
 export default store => {
   window.readerControl = {
@@ -232,6 +264,7 @@ export default store => {
     setSignatureFonts: setSignatureFonts(store),
     setSelectedTab: setSelectedTab(store),
     getSelectedThumbnailPageNumbers: getSelectedThumbnailPageNumbers(store),
+    setDisplayedSignaturesFilter: setDisplayedSignaturesFilterFunction(store),
     selectThumbnailPages: selectThumbnailPages(store),
     unselectThumbnailPages: unselectThumbnailPages(store),
     setAnnotationContentOverlayHandler: setAnnotationContentOverlayHandler(store),
@@ -271,6 +304,8 @@ export default store => {
     setSideWindowVisibility: setSideWindowVisibility(store),
     setActivePalette: setActivePalette(store),
     setColorPalette: setColorPalette(store),
+    setHighContrastMode: setHighContrastMode(store),
+    getIsHighContrastMode: getIsHighContrastMode(store),
     disableTool: disableTool(store),
     enableAllElements: enableAllElements(store),
     goToFirstPage,
@@ -290,6 +325,7 @@ export default store => {
     setReadOnly,
     setSortNotesBy: setSortNotesBy(store),
     getCustomData,
+    toggleReaderMode: toggleReaderMode(store),
 
     // undocumented
     useNativeScroll,

@@ -47,7 +47,6 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
   const currentWidth = currentLeftPanelWidth || currentNotesPanelWidth;
 
   const dispatch = useDispatch();
-
   const inputRef = useRef(null);
   useEffect(() => {
     if (isOpen) {
@@ -98,12 +97,14 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
 
     core.addEventListener('annotationChanged', _setNotes);
     core.addEventListener('annotationHidden', _setNotes);
+    core.addEventListener('updateAnnotationPermission', _setNotes);
 
     _setNotes();
 
     return () => {
       core.removeEventListener('annotationChanged', _setNotes);
       core.removeEventListener('annotationHidden', _setNotes);
+      core.removeEventListener('updateAnnotationPermission', _setNotes);
     };
   }, []);
 
@@ -122,6 +123,16 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     return () => core.removeEventListener('annotationSelected', onAnnotationSelected);
   }, []);
 
+  let singleSelectedNoteIndex = -1;
+  useEffect(() => {
+    if (Object.keys(selectedNoteIds).length && singleSelectedNoteIndex !== -1) {
+      listRef.current?.scrollToRow(singleSelectedNoteIndex);
+    }
+    // For newly created annotations the "annotationSelected" event fires before the "annotationChanged" event
+    // So "singleSelectedNoteIndex" will be -1 till "notes" are updated
+    // eslint-disable-next-line
+  }, [selectedNoteIds, notes]);
+
   // useEffect(() => {
   //   if (isOpen) {
   //     dispatch(actions.closeElements(['searchPanel', 'searchOverlay']));
@@ -132,6 +143,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     if (scrollTop) {
       scrollTopRef.current = scrollTop;
     }
+    dispatch(actions.closeElement('annotationNoteConnectorLine'));
   };
 
   const filterNote = note => {
@@ -221,7 +233,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       searchInput,
       resize,
       isSelected: selectedNoteIds[currNote.Id],
-      isContentEditable: core.canModify(currNote) && !currNote.getContents(),
+      isContentEditable: core.canModifyContents(currNote) && !currNote.getContents(),
       pendingEditTextMap,
       setPendingEditText,
       pendingReplyMap,
@@ -229,11 +241,17 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       isDocumentReadOnly,
     };
 
+    if (index === singleSelectedNoteIndex) {
+      setTimeout(() => {
+        // open the 'annotationNoteConnectorLine' since the note it's pointing to is being rendered
+        dispatch(actions.openElement('annotationNoteConnectorLine'));
+      }, 0);
+    }
     return (
       // unfortunately we need to use an actual div instead of React.Fragment here so that we can pass the correct index to scrollToRow
       // if this is a fragment then the listSeparator is rendered as a separate child, which means
       // singleSelectedNoteIndex might not be the index of the selected note among all the child elements of the notes panel
-      <div className="note-wrapper">
+      <div role="listitem" className="note-wrapper">
         {listSeparator}
         <NoteContext.Provider value={contextValue}>
           <Note
@@ -339,6 +357,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
             <div className="sort-container">
               <div className="label">{`${t('message.sortBy')}:`}</div>
               <Dropdown
+                dataElement="notesOrderDropdown"
                 items={Object.keys(getSortStrategies())}
                 translationPrefix="option.notesOrder"
                 currentSelectionKey={sortStrategy}
@@ -364,6 +383,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
               notes={notesToRender}
               onScroll={handleScroll}
               initialScrollTop={scrollTopRef.current}
+              selectedIndex={singleSelectedNoteIndex}
             >
               {renderChild}
             </VirtualizedList>

@@ -1,14 +1,13 @@
 import hotkeys from 'hotkeys-js';
 
 import core from 'core';
-import { isMac } from 'helpers/device';
+import { isMac, isMobile } from 'helpers/device';
 import openFilePicker from 'helpers/openFilePicker';
 import copyText from 'helpers/copyText';
 import setToolModeAndGroup from 'helpers/setToolModeAndGroup';
 import { zoomIn, zoomOut } from 'helpers/zoom';
 import { print } from 'helpers/print';
 import createTextAnnotationAndSelect from 'helpers/createTextAnnotationAndSelect';
-import { isMobile } from 'helpers/device';
 import isFocusingElement from 'helpers/isFocusingElement';
 import getNumberOfPagesToNavigate from 'helpers/getNumberOfPagesToNavigate';
 import setCurrentPage from 'helpers/setCurrentPage';
@@ -188,7 +187,7 @@ const HotkeysManager = {
   /**
    * Add an event handler for the given hotkey
    * @method WebViewerInstance.Hotkeys.on
-   * @param {string} key A keyboard key <br/>
+   * @param {string|WebViewerInstance.Hotkeys.Keys} key A keyboard key <br/>
    * If a hotkey is consisted of more than one key. Those keys should be connected using '+'.
    * @param {function|object} [handler] An optional argument <br/>
    * If it is undefined, the default handler of the given key will be registered <br/>
@@ -245,7 +244,7 @@ WebViewer(...)
   /**
    * Remove an event handler for the given hotkey
    * @method WebViewerInstance.Hotkeys.off
-   * @param {string} [key] An optional keyboard key. If not passed, all handlers will be removed
+   * @param {string|WebViewerInstance.Hotkeys.Keys} [key] An optional keyboard key. If not passed, all handlers will be removed
    * @param {function} [handler] An optional function. If not passed, all handlers of the given key will be removed
    * @example
 WebViewer(...)
@@ -405,6 +404,7 @@ WebViewer(...)
             'toolStylePopup',
             'annotationStylePopup',
             'signatureModal',
+            'customStampModal',
             'printModal',
             'rubberStampOverlay',
             'editTextModal',

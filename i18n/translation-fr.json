@@ -133,6 +133,8 @@
     "redaction": "Biffure",
     "viewControlsOverlay": "Contrôles de l'affichage",
     "calibration": "Étalonnage",
+    "zoomOverlay": "Superposition de zoom",
+    "textPopup": "Popup texte",
     "createStampButton": "Créer un nouveau tampon",
     "filter": "Filtre"
   },
@@ -164,12 +166,15 @@
     "insertTextHere": "Insérer du texte ici",
     "imageSignatureAcceptedFileTypes": "Seuls {{acceptedFileTypes}} sont acceptés",
     "enterMeasurement": "Entrez la mesure entre les deux points",
+    "errorEnterMeasurement": "Le nombre que vous avez entré est invalide, vous pouvez entrer des valeurs comme 7,5 ou 7 1/2",
     "linkURLorPage": "Lien URL ou une page",
     "enterReplacementText": "Entrez le texte que vous souhaitez remplacer",
-    "sortBy": "Trier par"
+    "sortBy": "Trier par",
+    "emptyCustomStampInput": "Le texte du tampon ne peut pas être vide"
   },
   "option": {
     "notesOrder": {
+      "dropdownLabel": "Liste des ordres de tri",
       "position": "Position",
       "time": "Temps",
       "status": "Statut",
@@ -177,6 +182,7 @@
       "type": "Type"
     },
     "toolbarGroup": {
+      "dropdownLabel": "Groupes de barres d'outils",
       "toolbarGroup-View": "Vue",
       "toolbarGroup-Annotate": "Annoter",
       "toolbarGroup-Shapes": "Formes",
@@ -188,6 +194,9 @@
       "StrokeColor": "Couleur de bordure",
       "FillColor": "Couleur de remplissage",
       "TextColor": "Couleur de texte"
+    },
+    "colorPalette": {
+      "colorLabel": "Couleur"
     },
     "displayMode": {
       "layout": "Disposition",
@@ -230,6 +239,11 @@
       "caseSensitive": "Sensible à la casse",
       "wholeWordOnly": "Mot complet",
       "wildcard": "Caractère générique"
+    },
+    "toolsOverlay": {
+      "currentStamp": "Timbre Actuel",
+      "currentSignature": "Signature Actuelle",
+      "signatureAltText": "Signature"
     },
     "stampOverlay": {
       "addStamp": "Ajouter un nouveau tampon"
@@ -373,7 +387,7 @@
     "richText": {
       "bold": "(Ctrl B)",
       "italic": "(Ctrl I)",
-      "underline": "(Ctrl L)",
+      "underline": "(Ctrl U)",
       "strikeout": "(Ctrl K)"
     }
   },

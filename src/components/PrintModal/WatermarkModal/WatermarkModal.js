@@ -6,7 +6,6 @@ import PropTypes from 'prop-types';
 import React from 'react';
 import { withTranslation } from 'react-i18next';
 import Button from 'components/Button';
-import ActionButton from 'components/ActionButton';
 import { FONTS } from './web-fonts';
 import './WatermarkModal.scss';
 
@@ -88,6 +87,8 @@ class WatermarkModal extends React.PureComponent {
   }
 
   componentDidUpdate(prevProps) {
+    core.addEventListener('documentLoaded', this.closeModal);
+
     if (this.props.isVisible !== prevProps.isVisible) {
       // Sets focus with a slight delay after modal becomes visible in order to
       // prevent stack overflow with competing print modal focus lock.
@@ -379,7 +380,7 @@ class WatermarkModal extends React.PureComponent {
                 <div className="watermark-settings">
                   <form id="form" onSubmit={e => e.preventDefault()}>
                     <div className="form-field">
-                      <label>{t(`option.watermark.location`)}</label>
+                      <label htmlFor="location">{t(`option.watermark.location`)}</label>
                       <select
                         id="location"
                         onChange={event => {
@@ -394,7 +395,7 @@ class WatermarkModal extends React.PureComponent {
 
                     <div className="form-field separator"></div>
                     <div className="form-field">
-                      <label>{t(`option.watermark.text`)}</label>
+                      <label htmlFor="textInput">{t(`option.watermark.text`)}</label>
                       <input
                         className="text-input"
                         id="textInput"
@@ -409,7 +410,7 @@ class WatermarkModal extends React.PureComponent {
                       />
                     </div>
                     <div className="form-field">
-                      <label>{t(`option.watermark.font`)}</label>
+                      <label htmlFor="fonts">{t(`option.watermark.font`)}</label>
                       <select
                         id="fonts"
                         value={formInfo[FORM_FIELD_KEYS.font]}
@@ -426,7 +427,7 @@ class WatermarkModal extends React.PureComponent {
                       </select>
                     </div>
                     <div className="form-field">
-                      <label>{t(`option.watermark.size`)}</label>
+                      <label htmlFor="fontSize">{t(`option.watermark.size`)}</label>
                       <select
                         id="fontSize"
                         value={formInfo[FORM_FIELD_KEYS.fontSize]}
@@ -463,9 +464,10 @@ class WatermarkModal extends React.PureComponent {
                     <div className="form-field">
                       <label>{t(`option.watermark.style`)}</label>
                       <div className="style-container">
-                        <div
+                        <Button
                           id="currentColorCell"
                           className="colorSelect"
+                          ariaLabel="colorSelectButton"
                           style={{
                             backgroundColor: formInfo[
                               FORM_FIELD_KEYS.color
@@ -476,7 +478,7 @@ class WatermarkModal extends React.PureComponent {
                               !this.state.isColorPaletteVisible,
                             )
                           }
-                        ></div>
+                        />
                         <div className="style-container">
                           <Button
                             dataElement="boldText"

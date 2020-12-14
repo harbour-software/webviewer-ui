@@ -8,7 +8,7 @@ import actions from 'actions';
 import selectors from 'selectors';
 import core from 'core';
 import useMedia from 'hooks/useMedia';
-import { Tabs, Tab, TabPanel } from 'components/Tabs';
+import { Tabs, Tab, TabPanel, TabHeader } from 'components/Tabs';
 import Icon from 'components/Icon';
 
 import { Swipeable } from 'react-swipeable';
@@ -68,19 +68,19 @@ class RubberStampOverlay extends React.Component {
     const { isMobile, standardStamps, customStamps } = this.props;
 
     const rubberStamps = standardStamps.map(({ imgSrc, annotation }, index) =>
-      <div key={index} className="rubber-stamp" onClick={() => this.setRubberStamp(annotation, index)}>
+      <button key={index} className="rubber-stamp" aria-label={`${this.props.t('annotation.stamp')} ${index + 1}`} onClick={() => this.setRubberStamp(annotation, index)}>
         <img src={imgSrc} alt="" />
-      </div>,
+      </button>,
     );
 
     const customImgs = customStamps.map(({ imgSrc, annotation }, index) =>
-      <div key={index}  className="stamp-row">
-        <div className="stamp-row-content" onClick={() => this.setRubberStamp(annotation, standardStamps.length + index)}>
+      <div key={index} className="stamp-row">
+        <button className="stamp-row-content custom-stamp" aria-label={`${this.props.t('annotation.rubberStamp')} ${index + 1}`} onClick={() => this.setRubberStamp(annotation, standardStamps.length + index)}>
           <img src={imgSrc} alt=""/>
-        </div>
-        <div className="icon" onClick={() => this.deleteCustomStamp(index)}>
+        </button>
+        <button className="icon" onClick={() => this.deleteCustomStamp(index)}>
           <Icon glyph="icon-delete-line"/>
-        </div>
+        </button>
       </div>,
     );
 
@@ -90,22 +90,23 @@ class RubberStampOverlay extends React.Component {
         data-element="rubberStampOverlay"
       >
         <Tabs id="rubberStampTab">
-          <div className="header tab-header">
-            <div className="tab-list">
-              <Tab dataElement="standardStampPanelButton">
-                <div className="tab-options-button">
-                  {this.props.t(`tool.Standard`)}
-                </div>
+          <TabHeader dataElement="rubberStampTabHeader">
+            <div className="header tab-header">
+              <div className="tab-list">
+                <Tab dataElement="standardStampPanelButton">
+                  <button className="tab-options-button">
+                    {this.props.t(`tool.Standard`)}
+                  </button>
               </Tab>
               <div className="tab-options-divider" />
-              <Tab dataElement="customStampPanelButton">
-                <div className="tab-options-button">
-                  {this.props.t(`tool.Custom`)}
-                </div>
-              </Tab>
+                <Tab dataElement="customStampPanelButton">
+                  <button className="tab-options-button">
+                    {this.props.t(`tool.Custom`)}
+                  </button>
+                </Tab>
+              </div>
             </div>
-          </div>
-
+          </TabHeader>
           <TabPanel dataElement="standardStampPanel">
             {/* Using Swipeable to stop the bubbling of swiping events when scrolling
               * Don't know a better way of doing this
@@ -123,14 +124,14 @@ class RubberStampOverlay extends React.Component {
             <div className="custom-stamp-panel">
               { customImgs }
             </div>
-            <div className={classNames({
+            <button className={classNames({
                 'stamp-row-content': true,
                 'add-btn': true,
               })}
               onClick={this.openCustomSampModal}
             >
               {this.props.t(`component.createStampButton`)}
-            </div>
+            </button>
           </TabPanel>
         </Tabs>
       </div>

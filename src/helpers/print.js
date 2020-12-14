@@ -14,9 +14,9 @@ let printQuality = 1;
 let colorMap;
 
 export const print = async(dispatch, isEmbedPrintSupported, sortStrategy, colorMap, options) => {
-  let allPages, includeAnnotations, includeComments, pagesToPrint, onProgress;
+  let includeAnnotations, includeComments, pagesToPrint, onProgress;
   if (options) {
-    ({ allPages, includeAnnotations, includeComments, pagesToPrint, onProgress } = options);
+    ({ includeAnnotations, includeComments, pagesToPrint, onProgress } = options);
   }
 
   if (!core.getDocument()) {
@@ -37,8 +37,8 @@ export const print = async(dispatch, isEmbedPrintSupported, sortStrategy, colorM
     printPdf().then(() => {
       dispatch(actions.closeElement('loadingModal'));
     });
-  } else if (allPages || includeAnnotations || includeComments || (pagesToPrint && pagesToPrint.length > 0)) {
-    if (allPages) {
+  } else if (includeAnnotations || includeComments) {
+    if (!pagesToPrint) {
       pagesToPrint = [];
       for (let i = 1; i <= core.getTotalPages(); i++) {
         pagesToPrint.push(i);
@@ -276,19 +276,45 @@ const positionCanvas = (canvas, pageIndex) => {
   const documentRotation = getDocumentRotation(pageIndex);
   const ctx = canvas.getContext('2d');
 
-  switch (documentRotation) {
-    case 1:
-      ctx.translate(width, 0);
-      break;
-    case 2:
-      ctx.translate(width, height);
-      break;
-    case 3:
-      ctx.translate(0, height);
-      break;
-  }
+  const printRotation = (4 - documentRotation) % 4;
+  // To check if automatic print rotation will be applied
+  const isAutoRotated = ((printRotation % 2 === 0 && width > height) || (printRotation % 2 === 1 && height > width));
 
-  ctx.rotate((documentRotation * 90 * Math.PI) / 180);
+  // If this is pdf js and auto rotated, apply different transform
+  if (window.utils.isPdfjs && isAutoRotated) {
+    switch (documentRotation) {
+      case 0:
+        ctx.translate(height, 0);
+        ctx.rotate(( 90 * Math.PI) / 180);
+        break;
+      case 1:
+        ctx.translate(0, height);
+        ctx.rotate(( 270 * Math.PI) / 180);
+        break;
+      case 2:
+        ctx.translate(height, 0);
+        ctx.rotate(( -270 * Math.PI) / 180);
+        break;
+      case 3:
+        ctx.translate(0, height);
+        ctx.rotate(( 270 * Math.PI) / 180);
+        break;
+    }
+
+  } else if (!window.utils.isPdfjs) {
+    switch (documentRotation) {
+      case 1:
+        ctx.translate(width, 0);
+        break;
+      case 2:
+        ctx.translate(width, height);
+        break;
+      case 3:
+        ctx.translate(0, height);
+        break;
+    }
+    ctx.rotate((documentRotation * 90 * Math.PI) / 180);
+  }
 };
 
 const drawAnnotationsOnCanvas = (canvas, pageNumber) => {

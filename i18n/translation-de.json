@@ -35,7 +35,7 @@
     "rotateCounterClockwise": "Gegen den Uhrzeigersinn",
     "save": "Speichern",
     "post": "Post",
-    "create": "Erzeugen",
+    "create": "Erstellen",
     "showMoreResults": "Mehr Ergebnisse anzeigen",
     "sign": "Unterschrift",
     "style": "Stil",
@@ -46,11 +46,11 @@
     "zoomSet": "Stellen Sie den Zoom ein",
     "zoomControls": "Zoomsteuerung",
     "draw": "Zeichnen",
-    "type": "Art",
+    "type": "Schreiben",
     "upload": "Hochladen",
     "link": "Verknüpfung",
     "darkMode": "Dunkler Modus",
-    "lightMode": "Lichtmodus",
+    "lightMode": "Heller Modus",
     "fileAttachmentDownload": "Laden Sie die angehängte Datei herunter",
     "prevResult": "Vorheriges Ergebnis",
     "nextResult": "Nächstes Ergebnis",
@@ -133,6 +133,8 @@
     "redaction": "Schwärzen",
     "viewControlsOverlay": "Anzeigeoptionen",
     "calibration": "Kalibrierung",
+    "zoomOverlay": "Zoom-Overlay",
+    "textPopup": "Text Popup",
     "createStampButton": "Neuen Stempel erstellen",
     "filter": "Filter"
   },
@@ -159,17 +161,20 @@
     "processing": "Bearbeite...",
     "searching": "Suche...",
     "searchCommentsPlaceholder": "Kommentare suchen",
-    "searchDocumentPlaceholder": "Dokument suchen",
+    "searchDocumentPlaceholder": "Dokument dursuchen",
     "signHere": "Hier unterschreiben",
     "insertTextHere": "Hier Text eingeben",
     "imageSignatureAcceptedFileTypes": "Es werden nur {{allowedFileTypes}} akzeptiert",
     "enterMeasurement": "Geben Sie das Maß zwischen den beiden Punkten ein",
+    "errorEnterMeasurement": "Die eingegebene Nummer ist ungültig. Sie können Werte wie 7,5 oder 7 1/2 eingeben",
     "linkURLorPage": "Link URL oder eine Seite",
     "enterReplacementText": "Geben Sie den Text ein, den Sie ersetzen möchten",
-    "sortBy": "Sortiere nach"
+    "sortBy": "Sortiere nach",
+    "emptyCustomStampInput": "Stempeltext darf nicht leer sein"
   },
   "option": {
     "notesOrder": {
+      "dropdownLabel": "Sortierreihenfolge Liste",
       "position": "Position",
       "time": "Zeit",
       "status": "Status",
@@ -177,7 +182,8 @@
       "type": "Art"
     },
     "toolbarGroup": {
-      "toolbarGroup-View": "Aussicht",
+      "dropdownLabel": "Symbolleistengruppen",
+      "toolbarGroup-View": "Ansicht",
       "toolbarGroup-Annotate": "Kommentieren",
       "toolbarGroup-Shapes": "Formen",
       "toolbarGroup-Insert": "Einfügen",
@@ -188,6 +194,9 @@
       "StrokeColor": "Randfarbe",
       "FillColor": "Füllfarbe",
       "TextColor": "Textfarbe"
+    },
+    "colorPalette": {
+      "colorLabel": "Farbe"
     },
     "displayMode": {
       "layout": "Layout",
@@ -230,6 +239,11 @@
       "caseSensitive": "Groß-/Kleinschreibung beachten",
       "wholeWordOnly": "Ganzes Wort",
       "wildcard": "Platzhalter"
+    },
+    "toolsOverlay": {
+      "currentStamp": "Aktueller Stempel",
+      "currentSignature": "Aktuelle Unterschrift",
+      "signatureAltText": "Unterschrift"
     },
     "stampOverlay": {
       "addStamp": "Neuen Stempel hinzufügen"

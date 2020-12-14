@@ -31,6 +31,7 @@ export default {
     documentContainerHeight: null,
     lastPickedToolForGroup: {},
     lastPickedToolGroup: {},
+    highContrastMode: getHashParams('highContrastMode', false),
     notesInLeftPanel: getHashParams('notesInLeftPanel', false),
     headers: {
       default: [
@@ -477,7 +478,9 @@ export default {
     customStamps: [],
     selectedStampIndex: 0,
     savedSignatures: [],
-    selectedSignatureIndex: 0,
+    displayedSavedSignatures: [],
+    displayedSignaturesFilterFunction: () => true,
+    selectedDisplayedSignatureIndex: 0,
     annotationContentOverlayHandler: null,
     isSnapModeEnabled: false,
     isReaderMode: false

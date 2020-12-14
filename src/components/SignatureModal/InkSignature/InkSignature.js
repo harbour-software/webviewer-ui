@@ -120,7 +120,7 @@ const InkSignature = ({
         if (!pathsCopy[i]) {
           pathsCopy[i] = [];
         }
-        pathsCopy[i][j] = new Annotations.Point(paths[i][j].x, paths[i][j].y);
+        pathsCopy[i][j] = new CoreControls.Math.Point(paths[i][j].x, paths[i][j].y);
       }
     }
 
@@ -174,12 +174,12 @@ const InkSignature = ({
       <div
         className="footer"
       >
-        <div className="signature-clear" onClick={clearCanvas}>
+        <button className="signature-clear" onClick={clearCanvas}>
           {t('action.clear')}
-        </div>
-        <div className="signature-create" onClick={createSignature}>
+        </button>
+        <button className="signature-create" onClick={createSignature}>
           {t('action.create')}
-        </div>
+        </button>
       </div>
     </React.Fragment>
   );

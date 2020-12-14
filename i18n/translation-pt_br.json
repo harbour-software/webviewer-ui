@@ -133,6 +133,8 @@
     "redaction": "Supressão",
     "viewControlsOverlay": "Controles de visualização",
     "calibration": "Calibração",
+    "zoomOverlay": "Sobreposição de zoom",
+    "textPopup": "Texto Popup",
     "createStampButton": "Criar novo carimbo",
     "filter": "Filtro"
   },
@@ -164,12 +166,15 @@
     "insertTextHere": "Insira texto aqui",
     "imageSignatureAcceptedFileTypes": "Somente {{acceptFileTypes}} são aceitos",
     "enterMeasurement": "Digite a medição entre os dois pontos",
+    "errorEnterMeasurement": "O número inserido é inválido, você pode inserir valores como 7,5 ou 7 1/2",
     "linkURLorPage": "URL do link ou uma página",
     "enterReplacementText": "Insira o texto que deseja substituir",
-    "sortBy": "Ordenar por"
+    "sortBy": "Ordenar por",
+    "emptyCustomStampInput": "O texto do carimbo não pode estar vazio"
   },
   "option": {
     "notesOrder": {
+      "dropdownLabel": "Classificar lista de pedidos",
       "position": "Posição",
       "time": "Hora",
       "status": "Status",
@@ -177,6 +182,7 @@
       "type": "Tipo"
     },
     "toolbarGroup": {
+      "dropdownLabel": "Grupos da barra de ferramentas",
       "toolbarGroup-View": "Visualizar",
       "toolbarGroup-Annotate": "Anotar",
       "toolbarGroup-Shapes": "Formas",
@@ -188,6 +194,9 @@
       "StrokeColor": "Cor da borda",
       "FillColor": "Cor de preenchimento",
       "TextColor": "Cor do texto"
+    },
+    "colorPalette": {
+      "colorLabel": "Cor"
     },
     "displayMode": {
       "layout": "Layout",
@@ -230,6 +239,11 @@
       "caseSensitive": "Diferenciar maiúsculas e minúsculas",
       "wholeWordOnly": "Palavra inteira",
       "wildcard": "Curinga"
+    },
+    "toolsOverlay": {
+      "currentStamp": "Carimbo Atual",
+      "currentSignature": "Assinatura Atual",
+      "signatureAltText": "Assinatura"
     },
     "stampOverlay": {
       "addStamp": "Adicionar novo carimbo"
@@ -373,7 +387,7 @@
     "richText": {
       "bold": "(Ctrl B)",
       "italic": "(Ctrl I)",
-      "underline": "(Ctrl L)",
+      "underline": "(Ctrl U)",
       "strikeout": "(Ctrl K)"
     }
   },

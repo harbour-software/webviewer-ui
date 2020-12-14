@@ -13,8 +13,14 @@
     fill: currentColor;
   }
 
-  path[fill=default] {
-    fill: var(--icon-color);
+  &:not(.disabled) {
+    path[fill=default] {
+      fill: var(--icon-color);
+    }
+  }
+
+  &.disabled {
+    fill: var(--disabled-icon);
   }
 
   path[fill=none],
