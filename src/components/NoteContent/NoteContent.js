@@ -20,7 +20,6 @@ import Icon from 'components/Icon';
 
 import core from 'core';
 import mentionsManager from 'helpers/MentionsManager';
-import getLatestActivityDate from 'helpers/getLatestActivityDate';
 import { mapAnnotationToKey, getDataWithKey } from 'constants/map';
 import escapeHtml from 'helpers/escapeHtml';
 import getFillClass from 'helpers/getFillClass';

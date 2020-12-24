@@ -284,23 +284,12 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     </div>
   );
 
-  let singleSelectedNoteIndex = -1;
   // keep track of the index of the single selected note in the sorted and filtered list
   // in order to scroll it into view in this render effect
   const ids = Object.keys(selectedNoteIds);
   if (ids.length === 1) {
     singleSelectedNoteIndex = notesToRender.findIndex(note => note.Id === ids[0]);
   }
-
-  useEffect(() => {
-    if (Object.keys(selectedNoteIds).length && singleSelectedNoteIndex !== -1) {
-      setTimeout(() => {
-        listRef.current?.scrollToRow(singleSelectedNoteIndex);
-      },0)
-    }
-    // we only want this effect to happen when we select some notes
-    // eslint-disable-next-line
-  }, [selectedNoteIds]); 
 
   let style = {};
   if (!isMobile) {

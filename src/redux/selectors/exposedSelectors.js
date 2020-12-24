@@ -31,10 +31,6 @@ export const getSearchPanelWidth = state =>
   state.viewer.panelWidths.searchPanel;
 export const getNotesPanelWidth = state =>
   state.viewer.panelWidths.notesPanel;
-export const getDocumentContainerWidth = state =>
-  state.viewer.documentContainerWidth;
-export const getDocumentContainerHeight = state =>
-  state.viewer.documentContainerHeight;
 
 const RESIZE_BAR_WIDTH = 14; // 14px Need to update this if styling results in a change to width.
 export const getLeftPanelWidthWithReszieBar = state =>
