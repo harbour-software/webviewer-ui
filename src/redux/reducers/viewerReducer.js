@@ -1,3 +1,5 @@
+import localStorageManager from 'helpers/localStorageManager';
+
 export default initialState => (state = initialState, action) => {
   const { type, payload } = action;
 
@@ -160,6 +162,16 @@ export default initialState => (state = initialState, action) => {
       return { ...state, activeToolName: payload.toolName };
     case 'SET_ACTIVE_TOOL_STYLES':
       return { ...state, activeToolStyles: { ...payload.toolStyles } };
+    case 'SET_CUSTOM_COLOR':
+      return { ...state, customColor: payload.customColor };
+    case 'SET_CUSTOM_COLORS':
+      if (localStorageManager.isLocalStorageEnabled()) {
+        window.localStorage.setItem('customColors', JSON.stringify(payload.customColors));
+      }
+      else {
+        console.error("localStorage is disabled, customColors cannot be restored");
+      }
+      return { ...state, customColors: payload.customColors };
     case 'SET_ACTIVE_TOOL_NAME_AND_STYLES':
       return {
         ...state,
@@ -208,6 +220,11 @@ export default initialState => (state = initialState, action) => {
       return {
         ...state,
         [payload.dataElement]: payload.items,
+      };
+    case 'SET_MENUOVERLAY_ITEMS':
+      return {
+        ...state,
+        menuOverlay: payload.items,
       };
     case 'REGISTER_TOOL':
       return {
@@ -348,8 +365,39 @@ export default initialState => (state = initialState, action) => {
       return { ...state, isSnapModeEnabled: payload.enable };
     case 'SET_READER_MODE':
       return { ...state, isReaderMode: payload.isReaderMode };
+    case 'SET_VALIDATION_MODAL_WIDGET_NAME':
+      return {
+        ...state,
+        validationModalWidgetName: payload.validationModalWidgetName,
+      }
+    case 'ADD_TRUSTED_CERTIFICATES':
+      /**
+       * To mimic the behavior of the Core implementation, where certificates
+       * can only be added but not removed, only allow this action to append
+       * to the existing array
+       */
+      return {
+        ...state,
+        certificates: [
+          ...state.certificates,
+          ...payload.certificates,
+        ]
+      };
+    case 'SET_VERIFICATION_RESULT':
+      return { ...state, verificationResult: payload.result };
     case 'SET_DISPLAYED_SIGNATURES_FILTER_FUNCTION':
       return { ...state, displayedSignaturesFilterFunction: payload.filterFunction };
+    case 'SET_ANNOTATION_READ_STATE':
+      const { unreadAnnotationIdSet } = state;
+      const { annotationId, isRead } = payload;
+      if (isRead){
+        unreadAnnotationIdSet.delete(annotationId);   
+      } else {
+        unreadAnnotationIdSet.add(annotationId);   
+      }
+      return { ...state, unreadAnnotationIdSet: new Set(unreadAnnotationIdSet) };
+    case 'SET_LANGUAGE':
+      return { ...state, currentLanguage: payload.language };
     default:
       return state;
   }

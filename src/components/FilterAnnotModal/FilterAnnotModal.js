@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import classNames from 'classnames';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
@@ -7,6 +7,7 @@ import defaultTool from 'constants/defaultTool';
 import core from 'core';
 import actions from 'actions';
 import selectors from 'selectors';
+import fireEvent from 'helpers/fireEvent';
 
 import Choice from 'components/Choice';
 import Button from 'components/Button';
@@ -30,13 +31,78 @@ const FilterAnnotModal = () => {
   const [authorFilter, setAuthorFilter] = useState([]);
   const [typesFilter, setTypesFilter] = useState([]);
 
+  const getAnnotationClass = annotation => {
+    if (annotation instanceof Annotations.CaretAnnotation) {
+      return 'caret';
+    }
+    if (annotation instanceof Annotations.CustomAnnotation) {
+      return 'custom';
+    }
+    if (annotation instanceof Annotations.EllipseAnnotation) {
+      return 'ellipse';
+    }
+    if (annotation instanceof Annotations.FileAttachmentAnnotation) {
+      return 'fileattachment';
+    }
+    if (annotation instanceof Annotations.FreeHandAnnotation) {
+      return 'freehand';
+    }
+    if (annotation instanceof Annotations.FreeTextAnnotation && annotation.getIntent() === window.Annotations.FreeTextAnnotation.Intent.FreeTextCallout) {
+      return 'callout';
+    }
+    if (annotation instanceof Annotations.FreeTextAnnotation) {
+      return 'freetext';
+    }
+    if (annotation instanceof Annotations.LineAnnotation) {
+      return 'line';
+    }
+    if (annotation instanceof Annotations.Link) {
+      return 'other';
+    }
+    if (annotation instanceof Annotations.PolygonAnnotation) {
+      return 'polygon';
+    }
+    if (annotation instanceof Annotations.PolylineAnnotation) {
+      return 'polyline';
+    }
+    if (annotation instanceof Annotations.RectangleAnnotation) {
+      return 'rectangle';
+    }
+    if (annotation instanceof Annotations.RedactionAnnotation) {
+      return 'redact';
+    }
+    if (annotation instanceof Annotations.SignatureWidgetAnnotation) {
+      return 'signature';
+    }
+    if (annotation instanceof Annotations.StampAnnotation) {
+      return 'stamp';
+    }
+    if (annotation instanceof Annotations.StickyAnnotation) {
+      return 'stickyNote';
+    }
+    if (annotation instanceof Annotations.TextHighlightAnnotation) {
+      return 'highlight';
+    }
+    if (annotation instanceof Annotations.TextStrikeoutAnnotation) {
+      return 'strikeout';
+    }
+    if (annotation instanceof Annotations.TextUnderlineAnnotation) {
+      return 'underline';
+    }
+    if (annotation instanceof Annotations.TextSquigglyAnnotation) {
+      return 'squiggly';
+    }
+
+    return 'other';
+  };
+
   const filterApply = () => {
     dispatch(
       actions.setCustomNoteFilter(annot => {
         let type = true;
         let author = true;
         if (typesFilter.length > 0) {
-          type = typesFilter.includes(annot.Subject);
+          type = typesFilter.includes(getAnnotationClass(annot));
         }
         if (authorFilter.length > 0) {
           author = authorFilter.includes(core.getDisplayAuthor(annot));
@@ -44,6 +110,7 @@ const FilterAnnotModal = () => {
         return type && author;
       }),
     );
+    fireEvent('annotationFilterChanged', { types: typesFilter, authors: authorFilter });
     closeModal();
   };
 
@@ -55,6 +122,7 @@ const FilterAnnotModal = () => {
     );
     setAuthorFilter([]);
     setTypesFilter([]);
+    fireEvent('annotationFilterChanged', { types: [], authors: [] });
   };
 
   const closeModal = () => {
@@ -72,12 +140,21 @@ const FilterAnnotModal = () => {
       if (core.getDisplayAuthor(annot) && core.getDisplayAuthor(annot) !== '') {
         authorsToBeAdded.add(core.getDisplayAuthor(annot));
       }
-      if (annot.Subject && annot.Subject !== '') {
-        annotTypesToBeAdded.add(annot.Subject);
+      // We don't show it in the filter for WidgetAnnotation or StickyAnnotation or LinkAnnotation from the comments  
+      if (annot instanceof Annotations.WidgetAnnotation 
+        || (annot instanceof Annotations.StickyAnnotation && annot.isReply())
+        || (annot instanceof Annotations.Link)){
+          return;
       }
+      annotTypesToBeAdded.add(getAnnotationClass(annot));
     });
     setAuthors([...authorsToBeAdded]);
     setAnnotTypes([...annotTypesToBeAdded]);
+
+    core.addEventListener('documentUnloaded', closeModal);
+    return () => {
+      core.removeEventListener('documentUnloaded', closeModal);
+    };
   }, [isOpen]);
 
   const modalClass = classNames({
@@ -122,12 +199,12 @@ const FilterAnnotModal = () => {
                   <div className="filter">
                     <div className="heading">{t('option.filterAnnotModal.types')}</div>
                     <div className="buttons">
-                      {[...annotTypes].map((val, index) => {
+                      {[...annotTypes].sort((type1, type2) => t(`annotation.${type1}`) <= t(`annotation.${type2}`) ? -1 : 1).map((val, index) => {
                         return (
                           <Choice
                             type="checkbox"
                             key={index}
-                            label={val}
+                            label={t(`annotation.${val}`)}
                             checked={typesFilter.includes(val)}
                             id={val}
                             onChange={e => {

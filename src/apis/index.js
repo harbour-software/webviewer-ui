@@ -71,6 +71,7 @@ import isReadOnly from './isReadOnly';
 import isToolDisabled from './isToolDisabled';
 import loadDocument from './loadDocument';
 import mentions from './mentions';
+import settingsMenuOverlay from './menuOverlay';
 import openElement from './openElement';
 import openElements from './openElements';
 import print from './print';
@@ -148,7 +149,14 @@ import setActiveResult from './setActiveResult';
 import setAnnotationContentOverlayHandler from './setAnnotationContentOverlayHandler';
 import overrideSearchExecution from "./overrideSearchExecution";
 import reactElements from './reactElements';
+import {
+  addTrustedCertificates,
+} from './verificationOptions';
 import toggleReaderMode from './toggleReaderMode';
+import setAnnotationReadState from './setAnnotationReadState';
+import getAnnotationReadState from './getAnnotationReadState';
+import enableClearSearchOnPanelClose from './enableClearSearchOnPanelClose';
+import disableClearSearchOnPanelClose from './disableClearSearchOnPanelClose';
 
 /**
  * Triggered when the UI theme is changed
@@ -174,6 +182,20 @@ import toggleReaderMode from './toggleReaderMode';
     instance.iframeWindow.addEventListener('panelResized', e => {
       const { element, width } = e.detail;
       console.log(element, width);
+    })
+  });
+ */
+
+/**
+ * Triggered when the annotation filter is changed. Returns empty arrays if the filter is cleared.
+ * @name WebViewerInstance#annotationFilterChanged
+ * @event
+ * @example
+ // Listening to this event
+  WebViewer(...).then(function(instance) {
+    instance.iframeWindow.addEventListener('annotationFilterChanged', e => {
+      const { types, authors } = e.detail;
+      console.log(types, authors);
     })
   });
  */
@@ -210,6 +232,7 @@ export default store => {
     isElementOpen: isElementOpen(store),
     isToolDisabled: isToolDisabled(store),
     loadDocument: loadDocument(store),
+    settingsMenuOverlay: settingsMenuOverlay(store),
     openElements: openElements(store),
     print: print(store),
     printInBackground: printInBackground(store),
@@ -230,7 +253,7 @@ export default store => {
     setFitMode,
     setHeaderItems: setHeaderItems(store),
     setIconColor: setIconColor(store),
-    setLanguage,
+    setLanguage: setLanguage(store),
     setLayoutMode,
     setMaxZoomLevel: setMaxZoomLevel(store),
     setMinZoomLevel: setMinZoomLevel(store),
@@ -268,6 +291,9 @@ export default store => {
     selectThumbnailPages: selectThumbnailPages(store),
     unselectThumbnailPages: unselectThumbnailPages(store),
     setAnnotationContentOverlayHandler: setAnnotationContentOverlayHandler(store),
+    verificationOptions: {
+      addTrustedCertificates: addTrustedCertificates(store),
+    },
 
     // undocumented and deprecated, to be removed in 7.0
     closeElement: closeElement(store),
@@ -337,5 +363,9 @@ export default store => {
     getBBAnnotManager,
     selectors: getSelectors(store),
     reactElements,
+    enableClearSearchOnPanelClose: enableClearSearchOnPanelClose(store),
+    disableClearSearchOnPanelClose: disableClearSearchOnPanelClose(store),
+    setAnnotationReadState: setAnnotationReadState(store),
+    getAnnotationReadState: getAnnotationReadState(store),
   };
 };

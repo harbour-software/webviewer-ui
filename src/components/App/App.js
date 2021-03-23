@@ -1,7 +1,6 @@
 import { hot } from 'react-hot-loader/root';
 import React, { useEffect } from 'react';
-import { useSelector, useStore, useDispatch } from 'react-redux';
-import selectors from 'selectors';
+import { useStore, useDispatch } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import Accessibility from 'components/Accessibility';
@@ -24,12 +23,13 @@ import PrintModal from 'components/PrintModal';
 import LoadingModal from 'components/LoadingModal';
 import ErrorModal from 'components/ErrorModal';
 import WarningModal from 'components/WarningModal';
+import SignatureValidationModal from 'components/SignatureValidationModal';
 import PasswordModal from 'components/PasswordModal';
 import ProgressModal from 'components/ProgressModal';
 import CalibrationModal from 'components/CalibrationModal';
 import LinkModal from 'components/LinkModal';
 import EditTextModal from 'components/EditTextModal';
-import FilterAnnotModal from '../FilterAnnotMondal';
+import FilterAnnotModal from '../FilterAnnotModal';
 import FilePickerHandler from 'components/FilePickerHandler';
 import CopyTextHandler from 'components/CopyTextHandler';
 import PrintHandler from 'components/PrintHandler';
@@ -40,8 +40,12 @@ import PageNextOverlay from 'components/PageNextOverlay';
 import PageSliderOverlay from 'components/PageSliderOverlay';
 import CreateStampModal from 'components/CreateStampModal';
 import CustomModal from 'components/CustomModal';
+import ColorPickerModal from 'components/ColorPickerModal';
 
+import core from 'core';
 import defineReaderControlAPIs from 'src/apis';
+import loadDocument from 'helpers/loadDocument';
+import getHashParams from 'helpers/getHashParams';
 import fireEvent from 'helpers/fireEvent';
 
 import actions from 'actions';
@@ -64,6 +68,39 @@ const App = ({ removeEventHandlers }) => {
     defineReaderControlAPIs(store);
     fireEvent('viewerLoaded');
 
+    function loadInitialDocument() {
+      const doesAutoLoad = getHashParams('auto_load', true);
+      const initialDoc = getHashParams('d', '');
+      const startOffline = getHashParams('startOffline', false);
+
+      if ((initialDoc && doesAutoLoad) || startOffline) {
+        const options = {
+          extension: getHashParams('extension', null),
+          filename: getHashParams('filename', null),
+          externalPath: getHashParams('p', ''),
+          documentId: getHashParams('did', null),
+        };
+
+        loadDocument(dispatch, initialDoc, options);
+      }
+    }
+
+    function messageHandler(event) {
+      if (event.isTrusted &&
+        typeof event.data === 'object' &&
+        event.data.type === 'viewerLoaded') {
+          loadInitialDocument();
+          window.removeEventListener('message', messageHandler);
+      }
+    }
+
+    window.addEventListener('message', messageHandler, false);
+
+    return removeEventHandlers;
+    // eslint-disable-next-line
+  }, []);
+
+  useEffect(() => {
     const setTabletState = () => {
       // TODO: Use constants
       dispatch(actions.setLeftPanelWidth(251));
@@ -77,11 +114,7 @@ const App = ({ removeEventHandlers }) => {
       }
     };
     tabletBreakpoint.addListener(onBreakpoint);
-
-    return removeEventHandlers;
-    // eslint-disable-next-line
   }, []);
-
 
   return (
     <React.Fragment>
@@ -131,6 +164,8 @@ const App = ({ removeEventHandlers }) => {
         <EditTextModal />
         <FilterAnnotModal />
         <CustomModal />
+        <ColorPickerModal />
+        {core.isFullPDFEnabled() && <SignatureValidationModal />}
       </div>
 
       <PrintHandler />

@@ -58,7 +58,8 @@
     "next": "下一個",
     "startFormEditing": "開始表格編輯",
     "exitFormEditing": "退出表格編輯模式",
-    "exit": "出口"
+    "exit": "出口",
+    "markAllRead": "將所有內容標記為已讀"
   },
   "annotation": {
     "areaMeasurement": "測量面積",
@@ -89,7 +90,9 @@
     "underline": "底線",
     "custom": "自訂",
     "rubberStamp": "橡皮圖章",
-    "note": "注意"
+    "note": "注意",
+    "link": "鏈接",
+    "other": "其他"
   },
   "rubberStamp": {
     "Approved": "已批准",
@@ -170,7 +173,8 @@
     "linkURLorPage": "鏈接網址或頁面",
     "enterReplacementText": "輸入您要替換的文字",
     "sortBy": "排序方式",
-    "emptyCustomStampInput": "印章文字不能為空"
+    "emptyCustomStampInput": "印章文字不能為空",
+    "unpostedComment": "未發布評論"
   },
   "option": {
     "notesOrder": {
@@ -223,14 +227,20 @@
     },
     "print": {
       "all": "全部",
-      "current": "目前",
+      "current": "當前頁面",
       "pages": "頁面",
+      "view": "目前來看",
       "pageQuality": "打印質量",
       "qualityNormal": "正常",
       "qualityHigh": "高",
       "includeAnnotations": "包括註釋",
       "includeComments": "包括評論",
       "addWatermarkSettings": "添加水印設置"
+    },
+    "printInfo": {
+      "author": "作者",
+      "subject": "學科",
+      "date": "日期"
     },
     "redaction": {
       "markForRedaction": "標示為修訂"
@@ -356,6 +366,10 @@
     "selectPage": {
       "selectTitle": "未選擇頁面",
       "selectMessage": "請選擇頁面，然後重試。"
+    },
+    "colorPicker": {
+      "deleteTitle": "刪除自定義顏色",
+      "deleteMessage": "刪除所選的自定義顏色？它將從您的調色板中刪除。"
     }
   },
   "shortcut": {
@@ -378,6 +392,7 @@
     "squiggly": "(G)",
     "stamp": "(I)",
     "redo": "（Ctrl Shift Z）",
+    "redo_windows": "(Ctrl Y)",
     "undo": "（Ctrl Z）",
     "stickyNote": "(N)",
     "strikeout": "(K)",
@@ -439,6 +454,109 @@
       "4": "週四",
       "5": "週五",
       "6": "週六"
+    }
+  },
+  "digitalSignatureModal": {
+    "certification": "認證證書",
+    "Certification": "資質認證",
+    "signature": "簽名",
+    "Signature": "簽名",
+    "valid": "有效",
+    "invalid": "無效",
+    "unknown": "未知",
+    "title": "{{type}}屬性",
+    "header": {
+      "documentIntegrity": "文件完整性",
+      "identitiesTrust": "身份與信任",
+      "generalErrors": "一般錯誤",
+      "digestStatus": "摘要狀態"
+    },
+    "documentPermission": {
+      "noChangesAllowed": "{{editor}}已指定不允許對此文檔進行任何更改",
+      "formfillingSigningAllowed": "{{editor}}已指定允許此文檔使用“表單填寫”和“簽名”。不允許其他更改。",
+      "annotatingFormfillingSigningAllowed": "{{editor}}已指定允許該文檔的表單填寫，簽名和註釋。不允許其他更改。",
+      "unrestricted": "{{editor}}已指定此文檔沒有任何限制。"
+    },
+    "digestAlgorithm": {
+      "preamble": "用於簽名簽名的摘要算法：",
+      "unknown": "用於簽名簽名的摘要算法未知。"
+    },
+    "trustVerification": {
+      "none": "沒有詳細的信任驗證結果。",
+      "current": "嘗試針對當前時間進行信任驗證",
+      "signing": "嘗試進行有關簽名時間的信任驗證：{{trustVerificationTime}}",
+      "timestamp": "嘗試針對安全嵌入式時間戳記進行信任驗證：{{trustVerificationTime}}"
+    },
+    "signerIdentity": {
+      "preamble": "簽名者的身份是",
+      "valid": "有效。",
+      "unknown": "未知。"
+    },
+    "summaryBox": {
+      "summary": "數字{{type}}是{{status}}",
+      "signedBy": "，由{{name}}簽名"
+    }
+  },
+  "digitalSignatureVerification": {
+    "certifier": "證明",
+    "certified": "認證的",
+    "Certified": "已認證",
+    "signer": "標誌",
+    "signed": "簽",
+    "Signed": "簽",
+    "by": "通過",
+    "on": "上",
+    "disallowedChange": "不允許更改：{{type}}，objnum：{{objnum}}",
+    "trustVerification": {
+      "current": "驗證時間為當前時間",
+      "signing": "驗證時間是來自簽名者計算機上的時鐘",
+      "timestamp": "驗證時間來自文檔中嵌入的安全時間戳",
+      "verifiedTrust": "信任驗證結果：已驗證",
+      "noTrustVerification": "沒有詳細的信任驗證結果。"
+    },
+    "permissionStatus": {
+      "noPermissionsStatus": "沒有權限狀態可以報告。",
+      "permissionsVerificationDisabled": "權限驗證已被禁用。",
+      "hasAllowedChanges": "該文檔具有簽名權限設置所允許的更改。",
+      "invalidatedByDisallowedChanges": "文檔具有簽名權限設置不允許的更改。",
+      "unmodified": "該文檔自從"
+    },
+    "trustStatus": {
+      "trustVerified": "已成功建立對{{verificationType}}的信任。",
+      "untrusted": "無法建立信任。",
+      "trustVerificationDisabled": "信任驗證已被禁用。",
+      "noTrustStatus": "沒有可報告的信任狀態。"
+    },
+    "digestStatus": {
+      "digestInvalid": "摘要不正確。",
+      "digestVerified": "摘要是正確的。",
+      "digestVerificationDisabled": "摘要驗證已禁用。",
+      "weakDigestAlgorithmButDigestVerifiable": "摘要是正確的，但摘要算法較弱且不安全。",
+      "noDigestStatus": "沒有摘要狀態可報告。",
+      "unsupportedEncoding": "沒有安裝的SignatureHandler能夠識別簽名的編碼"
+    },
+    "documentStatus": {
+      "noError": "沒有一般錯誤要報告。",
+      "corruptFile": "SignatureHandler報告文件損壞。",
+      "unsigned": "簽名尚未進行加密簽名。",
+      "badByteRanges": "SignatureHandler報告數字簽名中ByteRanges中的損壞。",
+      "corruptCryptographicContents": "SignatureHandler報告數字簽名內容中的損壞。"
+    },
+    "signatureDetails": {
+      "signatureDetails": "簽名細節",
+      "contactInformation": "聯繫信息",
+      "location": "位置",
+      "reason": "原因",
+      "signingTime": "簽約時間",
+      "noContactInformation": "沒有提供聯繫信息",
+      "noLocation": "沒有提供位置",
+      "noReason": "沒有提供原因",
+      "noSigningTime": "找不到簽名時間"
+    },
+    "panelMessages": {
+      "noSignatureFields": "該文檔沒有簽名字段",
+      "certificateDownloadError": "嘗試下載受信任的證書時遇到錯誤",
+      "localCertificateError": "讀取本地證書存在一些問題"
     }
   }
 }

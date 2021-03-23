@@ -2,7 +2,7 @@ import core from 'core';
 import isDataElementLeftPanel from 'helpers/isDataElementLeftPanel';
 import fireEvent from 'helpers/fireEvent';
 import { getMinZoomLevel, getMaxZoomLevel } from 'constants/zoomFactors';
-import {enableElements, disableElements} from 'actions/internalActions';
+import { enableElements, disableElements } from 'actions/internalActions';
 
 import defaultTool from 'constants/defaultTool';
 import { PRIORITY_TWO } from 'constants/actionPriority';
@@ -359,6 +359,7 @@ export const setActiveLeftPanel = dataElement => (dispatch, getState) => {
       'layersPanel',
       'bookmarksPanel',
       'notesPanel',
+      'signaturePanel',
     ].join(', ');
     console.warn(
       `${dataElement} is not recognized by the left panel. Please use one of the following options: ${panelDataElements}`,
@@ -475,7 +476,26 @@ export const setSearchResults = searchResults => ({
   type: 'SET_SEARCH_RESULTS',
   payload: searchResults,
 });
+
+export const setClearSearchOnPanelClose = shouldClear => ({
+  type: 'SET_CLEAR_SEARCH_ON_PANEL_CLOSE',
+  payload: shouldClear,
+});
+
 export const setAnnotationContentOverlayHandler = annotationContentOverlayHandler => ({
   type: 'SET_ANNOTATION_CONTENT_OVERLAY_HANDLER',
   payload: { annotationContentOverlayHandler }
+});
+
+export const setAnnotationReadState = ({ isRead, annotationId }) => ({
+  type: 'SET_ANNOTATION_READ_STATE',
+  payload: { isRead, annotationId } 
+})
+export const addTrustedCertificates = certificates => ({
+  type: 'ADD_TRUSTED_CERTIFICATES',
+  payload: { certificates },
+});
+export const setSignatureValidationModalWidgetName = widgetName => ({
+  type: 'SET_VALIDATION_MODAL_WIDGET_NAME',
+  payload: { validationModalWidgetName: widgetName },
 });

@@ -59,7 +59,8 @@
         "SwitchCase": 1,
         "FunctionExpression": {
           "body": 1
-        }
+        },
+        "ignoredNodes": ["TemplateLiteral"]
       }
     ],
     "keyword-spacing": 2,

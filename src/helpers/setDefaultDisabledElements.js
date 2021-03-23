@@ -83,7 +83,16 @@ export default store => {
   }
 
   if (!core.isFullPDFEnabled()) {
-    dispatch(actions.disableElements(['measurementSnappingOption'], PRIORITY_THREE));
+    dispatch(
+      actions.disableElements(
+        [
+          'measurementSnappingOption',
+          'signaturePanel',
+          'signaturePanelButton',
+        ],
+        PRIORITY_THREE,
+      ),
+    );
   }
 
   dispatch(
@@ -97,7 +106,9 @@ export default store => {
         'wildCardSearchOption',
         'readerPageTransitionButton',
         'editTextButton',
-        'mathSymbolsButton'
+        'mathSymbolsButton',
+        // disable it by default as PDFTron server side SDK currently can't handle this
+        'richTextPopup'
       ],
       PRIORITY_ONE,
     ),

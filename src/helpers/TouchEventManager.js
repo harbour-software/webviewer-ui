@@ -68,7 +68,10 @@ const TouchEventManager = {
         break;
       }
       case 2: {
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
+
         const t1 = e.touches[0];
         const t2 = e.touches[1];
         const clientX = (t1.clientX + t2.clientX) / 2;
@@ -123,7 +126,9 @@ const TouchEventManager = {
           return;
         }
 
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
 
         if (this.canLockScrolling()) {
           this.verticalLock = this.isScrollingVertically();
@@ -152,7 +157,9 @@ const TouchEventManager = {
         break;
       }
       case 2: {
-        e.preventDefault();
+        if (e.cancelable) {
+          e.preventDefault();
+        }
 
         const t1 = e.touches[0];
         const t2 = e.touches[1];
@@ -177,7 +184,7 @@ const TouchEventManager = {
       }
     }
   },
-  handleTouchEnd() {
+  handleTouchEnd(e) {
     switch (this.touch.type) {
       case 'tap': {
         this.doubleTapTimeout = setTimeout(() => {
@@ -234,10 +241,13 @@ const TouchEventManager = {
         break;
       }
       case 'doubleTap': {
+        const annotationUnderMouse = core.getAnnotationByMouseEvent(e);
+        const isFreeTextUnderMouse = annotationUnderMouse && annotationUnderMouse instanceof Annotations.FreeTextAnnotation;
+
         if (this.isUsingAnnotationTools()) {
           const tool = core.getToolMode();
           tool.finish && tool.finish();
-        } else {
+        } else if (!isFreeTextUnderMouse) {
           if (this.oldZoom) {
             this.touch.scale = Math.max(this.oldZoom / this.touch.zoom, getMinZoomLevel() / this.touch.zoom);
             this.oldZoom = null;
@@ -249,6 +259,13 @@ const TouchEventManager = {
           const { x, y } = this.getPointAfterScale();
           core.zoomTo(zoom, x, y);
         }
+
+        if (isFreeTextUnderMouse) {
+          core
+            .getAnnotationManager()
+            .trigger('annotationDoubleClicked', annotationUnderMouse);
+        }
+
         break;
       }
       case 'pinch': {

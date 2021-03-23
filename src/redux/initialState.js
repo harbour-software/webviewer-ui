@@ -8,7 +8,9 @@ import { defaultZoomList } from 'constants/zoomFactors';
 
 import core from 'core';
 import getHashParams from 'helpers/getHashParams';
+import localStorageManager from 'helpers/localStorageManager';
 import { copyMapWithDataProperties } from 'constants/map';
+import { defaultNoteDateFormat, defaultPrintedNoteDateFormat } from 'constants/defaultTimeFormat';
 import Ribbons from 'components/Ribbons';
 
 export default {
@@ -17,6 +19,7 @@ export default {
     canRedo: false,
     toolbarGroup: 'toolbarGroup-Annotate',
     activeTheme: 'light',
+    currentLanguage: 'en',
     disabledElements: {},
     openElements: {
       header: true,
@@ -262,7 +265,7 @@ export default {
         { type: 'spacer' },
         {
           type: 'actionButton',
-          dataElement: 'startFormEditingButton',
+          dataElement: 'startFormEditingToolGroupButton',
           title: 'action.startFormEditing',
           img: 'icon-widget-editing',
           onClick: () => {
@@ -326,6 +329,13 @@ export default {
       { dataElement: 'highlightToolButton' },
       { dataElement: 'freeHandToolButton' },
       { dataElement: 'freeTextToolButton' },
+    ],
+    menuOverlay: [
+      { dataElement: 'filePickerButton' },
+      { dataElement: 'fullscreenButton' },
+      { dataElement: 'downloadButton' },
+      { dataElement: 'printButton' },
+      { dataElement: 'themeChangeButton' },
     ],
     toolButtonObjects: {
       AnnotationCreateCountMeasurement: { dataElement: 'countMeasurementToolButton', title: 'annotation.countMeasurement', img: 'ic_check_black_24px', group: 'countTools', showColor: 'always' },
@@ -433,6 +443,7 @@ export default {
     activeHeaderGroup: 'default',
     activeToolName: 'AnnotationEdit',
     activeToolStyles: {},
+    customColors: localStorageManager.isLocalStorageEnabled() && window.localStorage.getItem("customColors") ? JSON.parse(window.localStorage.getItem("customColors")) : [],
     activeLeftPanel: 'thumbnailsPanel',
     activeToolGroup: '',
     notePopupId: '',
@@ -457,8 +468,8 @@ export default {
     useEmbeddedPrint: false,
     pageLabels: [],
     selectedThumbnailPageIndexes: [],
-    noteDateFormat: 'MMM D, h:mma',
-    printedNoteDateFormat: 'D/MM/YYYY h:mm:ss A',
+    noteDateFormat: defaultNoteDateFormat,
+    printedNoteDateFormat: defaultPrintedNoteDateFormat,
     colorMap: copyMapWithDataProperties('currentPalette', 'iconColor'),
     warning: {},
     customNoteFilter: null,
@@ -483,7 +494,11 @@ export default {
     selectedDisplayedSignatureIndex: 0,
     annotationContentOverlayHandler: null,
     isSnapModeEnabled: false,
-    isReaderMode: false
+    isReaderMode: false,
+    unreadAnnotationIdSet: new Set(),
+    certificates: [],
+    validationModalWidgetName: '',
+    verificationResult: {},
   },
   search: {
     value: '',
@@ -493,6 +508,7 @@ export default {
     isRegex: false,
     isSearchUp: false,
     isAmbientString: false,
+    clearSearchPanelOnClose: false,
     results: [],
   },
   document: {

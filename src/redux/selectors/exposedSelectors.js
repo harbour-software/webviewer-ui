@@ -1,4 +1,5 @@
 import { isChrome, isAndroid } from 'helpers/device';
+import { defaultNoteDateFormat, defaultPrintedNoteDateFormat } from 'constants/defaultTimeFormat';
 
 // viewer
 export const getIsHighContrastMode = state => state.viewer.highContrastMode;
@@ -167,6 +168,10 @@ export const getActiveToolName = state => state.viewer.activeToolName;
 
 export const getActiveToolStyles = state => state.viewer.activeToolStyles;
 
+export const getCustomColor = state => state.viewer.customColor;
+
+export const getCustomColors = state => state.viewer.customColors;
+
 export const getActiveLeftPanel = state => state.viewer.activeLeftPanel;
 
 export const getActiveToolGroup = state => state.viewer.activeToolGroup;
@@ -185,9 +190,9 @@ export const getSortStrategy = state => state.viewer.sortStrategy;
 
 export const getRotation = state => state.viewer.rotation;
 
-export const getNoteDateFormat = state => state.viewer.noteDateFormat;
+export const getNoteDateFormat = state => state.viewer.noteDateFormat || defaultNoteDateFormat;
 
-export const getPrintedNoteDateFormat = state => state.viewer.printedNoteDateFormat;
+export const getPrintedNoteDateFormat = state => state.viewer.printedNoteDateFormat || defaultPrintedNoteDateFormat;
 
 export const isFullScreen = state => state.viewer.isFullScreen;
 
@@ -252,6 +257,8 @@ export const getCustomElementOverrides = (state, dataElement) => state.viewer.cu
 export const getPopupItems = (state, popupDataElement) =>
   state.viewer[popupDataElement] || [];
 
+export const getMenuOverlayItems = state => state.viewer.menuOverlay;
+
 export const getIsThumbnailMergingEnabled = state => state.viewer.isThumbnailMerging;
 
 export const getIsThumbnailReorderingEnabled = state => state.viewer.isThumbnailReordering;
@@ -269,6 +276,12 @@ export const getAnnotationContentOverlayHandler = state => state.viewer.annotati
 export const getEnableMouseWheelZoom = state => state.viewer.enableMouseWheelZoom;
 
 export const isReaderMode = state => state.viewer.isReaderMode;
+
+export const getCertificates = state => state.viewer.certificates;
+
+export const getValidationModalWidgetName = state => state.viewer.validationModalWidgetName;
+
+export const getVerificationResult = (state, fieldName) => state.viewer.verificationResult[fieldName] || {};
 
 // warning message
 export const getWarningMessage = state => state.viewer.warning?.message || '';
@@ -311,6 +324,8 @@ export const getServerUrl = state => state.advanced.serverUrl;
 // search
 export const getSearchValue = state => state.search.value;
 
+export const shouldClearSearchPanelOnClose = state => state.search.clearSearchPanelOnClose;
+
 export const isCaseSensitive = state => state.search.isCaseSensitive;
 
 export const isWholeWord = state => state.search.isWholeWord;
@@ -328,3 +343,7 @@ export const getNoteTransformFunction = state => state.viewer.noteTransformFunct
 export const getCustomNoteSelectionFunction = state => state.viewer.customNoteFunction;
 
 export const isSnapModeEnabled = state => state.viewer.isSnapModeEnabled;
+
+export const getUnreadAnnotationIdSet = state => state.viewer.unreadAnnotationIdSet;
+
+export const getCurrentLanguage = state => state.viewer.currentLanguage;

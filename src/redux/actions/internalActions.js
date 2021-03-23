@@ -141,6 +141,14 @@ export const setActiveToolStyles = (toolStyles = {}) => ({
   type: 'SET_ACTIVE_TOOL_STYLES',
   payload: { toolStyles },
 });
+export const setCustomColor = (customColor = {}) => ({
+  type: 'SET_CUSTOM_COLOR',
+  payload: { customColor },
+});
+export const setCustomColors = (customColors = []) => ({
+  type: 'SET_CUSTOM_COLORS',
+  payload: { customColors },
+});
 export const setActiveToolGroup = toolGroup => (dispatch, getState) => {
   const currentActiveToolGroup = selectors.getActiveToolGroup(getState());
   const toolbarGroup = selectors.getCurrentToolbarGroup(getState());
@@ -211,6 +219,12 @@ export const setPopupItems = (dataElement, items) => ({
   type: 'SET_POPUP_ITEMS',
   payload: {
     dataElement,
+    items,
+  },
+});
+export const setMenuOverlayItems = items => ({
+  type: 'SET_MENUOVERLAY_ITEMS',
+  payload: {
     items,
   },
 });
@@ -305,6 +319,10 @@ export const resetLoadingProgress = () => ({
   type: 'SET_LOADING_PROGRESS',
   payload: { progress: 0 },
 });
+export const setVerificationResult = result => ({
+  type: 'SET_VERIFICATION_RESULT',
+  payload: { result },
+});
 
 // user
 export const setUserName = userName => ({
@@ -363,4 +381,9 @@ export const setCustomNoteSelectionFunction = customNoteFunction => ({
 export const setEnableSnapMode = enable => ({
   type: 'SET_ENABLE_SNAP_MODE',
   payload: { enable },
+});
+
+export const setLanguage = language => ({
+  type: 'SET_LANGUAGE',
+  payload: { language },
 });

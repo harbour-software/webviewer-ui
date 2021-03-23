@@ -30,7 +30,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     customNoteFilter,
     currentNotesPanelWidth,
     notesInLeftPanel,
-    isDocumentReadOnly
+    isDocumentReadOnly,
   ] = useSelector(
     state => [
       selectors.getSortStrategy(state),
@@ -115,13 +115,15 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       core.getSelectedAnnotations().forEach(annot => {
         ids[annot.Id] = true;
       });
-      setSelectedNoteIds(ids);
+      if (isOpen) {
+        setSelectedNoteIds(ids);
+      }
     };
     onAnnotationSelected();
 
     core.addEventListener('annotationSelected', onAnnotationSelected);
     return () => core.removeEventListener('annotationSelected', onAnnotationSelected);
-  }, []);
+  }, [isOpen]);
 
   let singleSelectedNoteIndex = -1;
   useEffect(() => {
@@ -228,6 +230,17 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       listSeparator = <ListSeparator renderContent={() => getSeparatorContent(prevNote, currNote, { pageLabels })} />;
     }
 
+    //Collapse an expanded note when the top non-reply NoteContent is clicked
+    const handleNoteClicked = () => {
+      if(selectedNoteIds[currNote.Id]) {
+        setSelectedNoteIds(currIds => {
+          const clone = {...currIds};
+          delete clone[currNote.Id];
+          return clone;
+        });
+        core.deselectAnnotation(currNote);
+      }
+    }
     // can potentially optimize this a bit since a new reference will cause consumers to rerender
     const contextValue = {
       searchInput,
@@ -239,6 +252,8 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
       pendingReplyMap,
       setPendingReply,
       isDocumentReadOnly,
+      isNotePanelOpen: isOpen,
+      onTopNoteContentClicked: handleNoteClicked,
     };
 
     if (index === singleSelectedNoteIndex) {
@@ -247,6 +262,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
         dispatch(actions.openElement('annotationNoteConnectorLine'));
       }, 0);
     }
+
     return (
       // unfortunately we need to use an actual div instead of React.Fragment here so that we can pass the correct index to scrollToRow
       // if this is a fragment then the listSeparator is rendered as a separate child, which means
@@ -296,8 +312,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
     style = { width: `${currentWidth}px`, minWidth: `${currentWidth}px` };
   }
 
-  return (
-
+  return ((isDisabled || !isOpen) ? null : (
     <div
       className={classNames({
         Panel: true,
@@ -340,6 +355,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
             <Button
               dataElement="filterAnnotationButton"
               className="filter-annotation-button"
+              disabled={notes.length === 0}
               label={t('component.filter')}
               onClick={() => dispatch(actions.openElement('filterModal'))}
             />
@@ -347,6 +363,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
               <div className="label">{`${t('message.sortBy')}:`}</div>
               <Dropdown
                 dataElement="notesOrderDropdown"
+                disabled={notesToRender.length === 0}
                 items={Object.keys(getSortStrategies())}
                 translationPrefix="option.notesOrder"
                 currentSelectionKey={sortStrategy}
@@ -379,7 +396,7 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
           )}
       </React.Fragment>
     </div>
-  );
+  ));
 };
 
 export default NotesPanel;

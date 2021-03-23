@@ -29,8 +29,8 @@
       width: 100%;
       transition: all .3s ease;
 
-      * {
-        pointer-events: all;
+      &>* {
+        pointer-events: auto;
       }
     }
   }
