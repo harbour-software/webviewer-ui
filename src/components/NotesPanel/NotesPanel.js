@@ -340,6 +340,20 @@ const NotesPanel = ({ currentLeftPanelWidth }) => {
         </div>}
       <React.Fragment>
         <div className="header">
+        <div>
+            <Button
+                dataElement="toggleNotesButton"
+                className="toggle-notes-button"
+                label="Hide Annotations"
+              />
+          </div>
+          <div>
+            <span className="label">History:&nbsp;</span>
+            <select
+              id="annotHistorySelect"
+            >
+            </select>
+          </div>
           <div className="input-container">
             <input
               type="text"

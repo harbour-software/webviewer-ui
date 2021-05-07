@@ -240,4 +240,23 @@
       }
     }
   }
+
+  .toggle-notes-button {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 1px solid var(--border);;
+    color: var(--text-color);
+    padding: 6px 18px;
+    width: auto;
+    width: fit-content;
+    border-radius: 4px;
+    height: 28px;
+    cursor: pointer;
+    margin-bottom: 10px;
+  }
+
+  #annotHistorySelect {
+    margin-bottom: 10px;
+  }
 }
