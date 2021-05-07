@@ -107,6 +107,10 @@ export const setIsMultipleViewerMerging = (isMultipleViewerMerging = false) => (
   type: 'SET_MULTI_VIEWER_MERGING',
   payload: { isMultipleViewerMerging },
 });
+export const setEnableNotesPanelVirtualizedList = (enableNotesPanelVirtualizedList = true) => ({
+  type: 'SET_ENABLE_NOTE_PANEL_VIRTUALIZED_LIST',
+  payload: { enableNotesPanelVirtualizedList },
+});
 export const setAllowPageNavigation = (allowPageNavigation = true) => ({
   type: 'SET_ALLOW_PAGE_NAVIGATION',
   payload: { allowPageNavigation },
@@ -114,6 +118,10 @@ export const setAllowPageNavigation = (allowPageNavigation = true) => ({
 export const setLastPickedToolForGroup = (group, toolName) => ({
   type: 'SET_LAST_PICKED_TOOL_FOR_GROUP',
   payload: { group, toolName },
+});
+export const setEnableToolGroupReordering = (enableToolGroupReordering = true) => ({
+  type: 'ENABLE_TOOL_GROUP_REORDERING',
+  payload: { enableToolGroupReordering },
 });
 export const setActiveToolNameAndStyle = toolObject => (dispatch, getState) => {
   const state = getState();

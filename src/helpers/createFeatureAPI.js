@@ -170,6 +170,11 @@ export default (enable, store) => features => {
         store.dispatch(actions.setThumbnailMultiselect(enable));
       },
     },
+    [Feature.NotesPanelVirtualizedList]: {
+      fn: () => {
+        store.dispatch(actions.setEnableNotesPanelVirtualizedList(enable));
+      },
+    },
     [Feature.PageNavigation]: {
       fn: () => {
         const {
@@ -218,6 +223,19 @@ export default (enable, store) => features => {
     },
     [Feature.MathSymbols]: {
       dataElements: ['mathSymbolsButton'],
+    },
+    [Feature.OutlineEditing]: {
+      dataElements: [
+        'outlineControls',
+        'addNewOutlineButtonContainer',
+        'addNewOutlineButton',
+        'outlineReorderButtonGroup',
+        'outlineControls',
+        'editOutlineButton',
+        'outlineEditPopup',
+        'renameOutlineButton',
+        'deleteOutlineButton',
+      ],
     },
   };
 

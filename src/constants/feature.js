@@ -20,6 +20,8 @@
  * @property {string} MouseWheelZoom Ability to zoom when holding ctrl/cmd + mouse wheel.
  * @property {string} Search Ctrl/Cmd + F hotkey and a search button that can be clicked to search the current document.
  * @property {string} MathSymbols Ability to add math symbols in free text editor
+ * @property {string} OutlineEditing Ability to add, move and delete outlines in the outlines panel. This feature is only available when `fullAPI: true` is used.
+ * @property {string} NotesPanelVirtualizedList Ability to use a virtualized list in the note panel. Will limit the number of notes rendered on the DOM
  * @example
 WebViewer(...)
   .then(function(instance) {
@@ -49,5 +51,7 @@ export default {
   PageNavigation: 'PageNavigation',
   MouseWheelZoom: 'MouseWheelZoom',
   Search: 'Search',
-  MathSymbols: 'MathSymbols'
+  MathSymbols: 'MathSymbols',
+  OutlineEditing: 'OutlineEditing',
+  NotesPanelVirtualizedList: 'NotesPanelVirtualizedList',
 };

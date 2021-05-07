@@ -1,5 +1,5 @@
 import { Frame } from 'puppeteer';
-import { loadViewerSample } from '../../utils';
+import { loadViewerSample, Timeouts } from '../../utils';
 
 const addAndCreateAnnot = (iFrame: Frame, isFreeTextAnnot: boolean, isLockedContents: boolean, noteContent = '', author = '',) => {
   return (iFrame as Frame).evaluate(async(isFreeTextAnnot, isLockedContents, noteContent, author) => {
@@ -65,16 +65,18 @@ const hideDateTimeInNotesPanel = (iframe: Frame) => {
 };
 
 describe('Test cases for comment panel', () => {
-  let result: { iframe: Frame; waitForInstance; waitForWVEvent};
+  let result: { iframe: Frame; waitForInstance; waitForWVEvent };
+
   beforeEach(async() => {
-    result = await loadViewerSample(
-      'viewing/viewing',
-    );
+    result = await loadViewerSample('viewing/blank');
+    const instance = await result.waitForInstance();
+    await instance('enableElements', ['richTextPopup']);
     await result.waitForWVEvent('annotationsLoaded');
   });
 
-  it('should not be able to edit comment for not locked content non-free text annotation', async() => {
+  it.skip('should not be able to edit comment for not locked content non-free text annotation', async() => {
     await addAndCreateAnnot(result.iframe, false, true, 'some-content');
+    const instance = await result.waitForInstance();
 
     const annotId = await (result.iframe as Frame).evaluate(async() => {
       const annots = window.readerControl.docViewer.getAnnotationManager().getAnnotationsList()
@@ -84,18 +86,20 @@ describe('Test cases for comment panel', () => {
 
     await selectAnnotation(annotId, result.iframe);
 
-    await (result.iframe as Frame).click('[data-element=annotationCommentButton]');
-    await page.waitFor(2000);
+    instance('openElement', 'notesPanel');
+    await page.waitFor(500);
+
     await hideDateTimeInNotesPanel(result.iframe);
-    await page.waitFor(2000);
     const pageContainer = await (result.iframe as Frame).$('.NotesPanel');
+    await page.waitFor(2000);
     expect(await pageContainer.screenshot()).toMatchImageSnapshot({
       customSnapshotIdentifier: 'comment-panel-non-free-text-annot-locked-content',
     });
   });
 
-  it('should be able to edit comment for locked content non-free text annotation', async() => {
+  it.skip('should be able to edit comment for locked content non-free text annotation', async() => {
     await addAndCreateAnnot(result.iframe, false, false, 'some-content');
+    const instance = await result.waitForInstance();
 
     const annotId = await (result.iframe as Frame).evaluate(async() => {
       const annots = window.readerControl.docViewer.getAnnotationManager().getAnnotationsList()
@@ -105,18 +109,20 @@ describe('Test cases for comment panel', () => {
 
     await selectAnnotation(annotId, result.iframe);
 
-    await (result.iframe as Frame).click('[data-element=annotationCommentButton]');
-    await page.waitFor(2000);
+    instance('openElement', 'notesPanel');
+    await page.waitFor(1000);
+
     await hideDateTimeInNotesPanel(result.iframe);
-    await page.waitFor(2000);
     const pageContainer = await (result.iframe as Frame).$('.NotesPanel');
+    await page.waitFor(2000);
     expect(await pageContainer.screenshot()).toMatchImageSnapshot({
       customSnapshotIdentifier: 'comment-panel-non-free-text-annot-not-locked-content',
     });
   });
 
-  it('should not be able to edit comment for locked content free text annotation', async() => {
+  it.skip('should not be able to edit comment for locked content free text annotation', async() => {
     await addAndCreateAnnot(result.iframe, true, true, 'some-content');
+    const instance = await result.waitForInstance();
 
     const annotId = await (result.iframe as Frame).evaluate(async() => {
       const annots = window.readerControl.docViewer.getAnnotationManager().getAnnotationsList()
@@ -126,28 +132,31 @@ describe('Test cases for comment panel', () => {
 
     await selectAnnotation(annotId, result.iframe);
 
-    await (result.iframe as Frame).click('[data-element=annotationCommentButton]');
-    await page.waitFor(2000);
+    instance('openElement', 'notesPanel');
+    await page.waitFor(1000);
+
     await hideDateTimeInNotesPanel(result.iframe);
-    await page.waitFor(2000);
     const pageContainer = await (result.iframe as Frame).$('.NotesPanel');
+    await page.waitFor(2000);
     expect(await pageContainer.screenshot()).toMatchImageSnapshot({
       customSnapshotIdentifier: 'comment-panel-free-text-annot-locked-content',
     });
   });
 
   it('should be able to edit comment for not locked content free text annotation', async() => {
+    await page.waitFor(Timeouts.PDF_PRIME_DOCUMENT);
+
     await addAndCreateAnnot(result.iframe, true, false, 'some-content');
     // on creation of free text annot, text can be edited right away
-    await page.waitFor(2000);
     const pageContainer = await result.iframe.$('#pageContainer1');
     expect(await pageContainer.screenshot()).toMatchImageSnapshot({
       customSnapshotIdentifier: 'comment-panel-free-text-annot-not-locked-content',
     });
   });
 
-  it('should be able to only add reply to annotation that does not belong to user', async() => {
+  it.skip('should be able to only add reply to annotation that does not belong to user', async() => {
     await addAndCreateAnnot(result.iframe, false, true, undefined, 'a');
+    const instance = await result.waitForInstance();
 
     const annotId = await (result.iframe as Frame).evaluate(async() => {
       const annots = window.readerControl.docViewer.getAnnotationManager().getAnnotationsList()
@@ -168,8 +177,9 @@ describe('Test cases for comment panel', () => {
 
     await selectAnnotation(annotId, result.iframe);
 
-    await (result.iframe as Frame).click('[data-element=annotationCommentButton]');
-    await page.waitFor(2000);
+    instance('openElement', 'notesPanel');
+    await page.waitFor(500);
+
     await hideDateTimeInNotesPanel(result.iframe);
     await page.waitFor(2000);
 
@@ -177,5 +187,163 @@ describe('Test cases for comment panel', () => {
     expect(await pageContainer.screenshot()).toMatchImageSnapshot({
       customSnapshotIdentifier: 'can-only-add-reply-non-admin-diff-user',
     });
+  });
+
+  it('should be able to scroll to group annotation', async() => {
+    const instance = await result.waitForInstance();
+    await instance('loadDocument', '/test-files/annots1-rotated-cropped.pdf');
+    await result.waitForWVEvent('annotationsLoaded');
+
+    instance('openElement', 'notesPanel');
+
+    await result.iframe.evaluate(async() => {
+      const annotManager = window.docViewer.getAnnotationManager();
+      annotManager.setIsAdminUser(true);
+
+      let annotations = annotManager.getAnnotationsList().filter(a => a.PageNumber === 5);
+
+      let parentAnnot = annotations[0];
+      let childrenAnnots = annotations.slice(1,5);
+
+      annotManager.groupAnnotations(parentAnnot, childrenAnnots);
+      annotManager.selectAnnotation(childrenAnnots[0]);
+    });
+
+    await page.waitFor(Timeouts.REACT_RERENDER);
+
+    const pageContainer = await result.iframe.$('.Note.expanded');
+    expect(await pageContainer.evaluate((node) => node.innerHTML)).toBeTruthy();
+  });
+
+  it('should be able to scroll to selected annotation for VirtualizedList', async() => {
+    const instance = await result.waitForInstance();
+
+    await instance('loadDocument', '/test-files/VirtualizedAnnotTest.pdf');
+    await result.waitForWVEvent('annotationsLoaded');
+  
+    instance('openElement', 'notesPanel');
+  
+    const selectAnnotAndTest = async (index) => {
+      let annotId = await (result.iframe as Frame).evaluate(async(index) => {
+        const annotManager = window.docViewer.getAnnotationManager();
+        annotManager.deselectAllAnnotations();
+
+        const annots = annotManager.getAnnotationsList().filter(annot => annot instanceof window.Annotations.FreeTextAnnotation);
+        annotManager.selectAnnotation(annots[index]);
+
+        return annots[index].Id;
+      }, index);
+
+      await page.waitFor(500);
+
+      // check if the note is being rendered in teh virtualized list
+      const noteContainer = await result.iframe.$(`#note_${annotId}`);
+      expect(await noteContainer.evaluate((node) => node.innerHTML)).toBeTruthy();
+
+      let focusedElement = await (result.iframe as Frame).evaluate(async() => {
+        return document.activeElement.constructor.name;
+      });
+
+      // check if focusing on the textarea, can't think of any other way to tell if there is a blinking text cursor
+      expect(focusedElement).toBe("HTMLTextAreaElement");
+
+      const notePanel = await result.iframe.$(`.NotesPanel .ReactVirtualized__Grid`);
+      const selectedScrollTop = await notePanel.evaluate((node) => node.scrollTop);
+
+      await (result.iframe as Frame).evaluate(async(index) => {
+        const annotManager = window.docViewer.getAnnotationManager();
+        annotManager.deselectAllAnnotations();
+      }, index);
+      await page.waitFor(500);
+
+      const deselectedScrollTop = await notePanel.evaluate((node) => node.scrollTop);
+      // check if the note panel stay near the same location when closing the note
+      expect(Math.abs(selectedScrollTop - deselectedScrollTop)).toBeLessThan(5);
+    };
+
+    await selectAnnotAndTest(30);
+    await selectAnnotAndTest(60);
+    await selectAnnotAndTest(10);
+    await selectAnnotAndTest(88);
+  });
+
+  it('Buttons should be disabled if there is nothing to persist', async() => {
+    await page.waitFor(Timeouts.PDF_PRIME_DOCUMENT);
+
+    const instance = await result.waitForInstance();
+
+    await instance('setToolMode', 'AnnotationCreateSticky');
+    const pageContainer = await result.iframe.$('#pageContainer1');
+    const { x, y } = await pageContainer.boundingBox();
+    await page.mouse.click(x + 100, y + 20);
+
+    await page.waitFor(1000);
+
+    const saveButton = await result.iframe.$('.save-button');
+    expect(await saveButton.evaluate((element) => element.classList.contains('disabled'))).toBeTruthy();
+
+    await result.iframe.focus('div.edit-content textarea');
+    await page.keyboard.type('Some content');
+
+    await page.waitFor(500);
+
+    expect(await saveButton.evaluate((element) => !element.classList.contains('disabled'))).toBeTruthy();
+
+    await result.iframe.$eval( '.save-button', (element) => element.click());
+
+    await page.waitFor(1000);
+
+    const replyButton = await result.iframe.$('.reply-button');
+    expect(await replyButton.evaluate((element) => element.classList.contains('disabled'))).toBeTruthy();
+
+    await result.iframe.focus('div.reply-area-container textarea');
+    await page.keyboard.type('Some reply');
+
+    await page.waitFor(500);
+
+    expect(await replyButton.evaluate((element) => !element.classList.contains('disabled'))).toBeTruthy();
+  });
+
+  it('should be able enable and disable virtualized list', async() => {
+    const instance = await result.waitForInstance();
+
+    await instance('loadDocument', '/test-files/VirtualizedAnnotTest.pdf');
+    await result.waitForWVEvent('annotationsLoaded');
+  
+    instance('openElement', 'notesPanel');
+    await page.waitFor(500);
+
+    let annotCount = await (result.iframe as Frame).evaluate(async() => {
+      return window.readerControl.docViewer.getAnnotationManager().getAnnotationsList().filter(a => !a.InReplyTo && a.Listable).length;
+    });
+
+    let noteEleCount = await (result.iframe as Frame).evaluate(async() => {
+      return Array.from(document.querySelectorAll('.Note')).length;
+    });
+
+    await page.waitFor(500);
+    expect(annotCount).toBeGreaterThan(noteEleCount);
+
+    await (result.iframe as Frame).evaluate(async() => {
+      window.readerControl.disableFeatures(window.readerControl.Feature.NotesPanelVirtualizedList);
+    });
+
+    await page.waitFor(2000);
+
+    let nonVirtualListNoteEleCount = await (result.iframe as Frame).evaluate(async() => {
+      return Array.from(document.querySelectorAll('.Note')).length;
+    });
+
+    expect(annotCount).toEqual(nonVirtualListNoteEleCount);
+
+    await (result.iframe as Frame).evaluate(async() => {
+      window.readerControl.enableFeatures(window.readerControl.Feature.NotesPanelVirtualizedList);
+    });
+
+    let virtualNoteEleCount = await (result.iframe as Frame).evaluate(async() => {
+      return Array.from(document.querySelectorAll('.Note')).length;
+    });
+
+    expect(virtualNoteEleCount).toEqual(noteEleCount);
   });
 });

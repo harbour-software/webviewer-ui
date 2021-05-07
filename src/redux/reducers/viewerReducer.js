@@ -156,6 +156,8 @@ export default initialState => (state = initialState, action) => {
         ...state,
         openElements: { ...state.openElements, [payload.dataElement]: false },
       };
+    case 'ENABLE_TOOL_GROUP_REORDERING':
+      return { ...state, enableToolGroupReordering: payload.enableToolGroupReordering };
     case 'SET_ACTIVE_HEADER_GROUP':
       return { ...state, activeHeaderGroup: payload.headerGroup };
     case 'SET_ACTIVE_TOOL_NAME':
@@ -189,6 +191,8 @@ export default initialState => (state = initialState, action) => {
           [payload.toolbarGroup]: payload.toolGroup,
         },
       };
+    case 'SET_OUTLINE_CONTROL_VISIBILITY':
+      return { ...state, outlineControlVisibility: payload.outlineControlVisibility };
     case 'SET_NOTE_POPUP_ID':
       return { ...state, notePopupId: payload.id };
     case 'SET_NOTE_EDITING':
@@ -274,6 +278,8 @@ export default initialState => (state = initialState, action) => {
       return { ...state, isThumbnailMultiselect: payload.useThumbnailMultiselect };
     case 'SET_MULTI_VIEWER_MERGING':
       return { ...state, isMultipleViewerMerging: payload.isMultipleViewerMerging };
+    case 'SET_ENABLE_NOTE_PANEL_VIRTUALIZED_LIST':
+      return { ...state, enableNotesPanelVirtualizedList: payload.enableNotesPanelVirtualizedList };  
     case 'SET_ALLOW_PAGE_NAVIGATION':
       return { ...state, allowPageNavigation: payload.allowPageNavigation };
     case 'SET_READ_ONLY':

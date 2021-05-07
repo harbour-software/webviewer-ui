@@ -1,10 +1,9 @@
 import React, {
-  useState,
   useRef,
   useEffect,
   useContext,
   useMemo,
-  useCallback,
+  useCallback
 } from 'react';
 import PropTypes from 'prop-types';
 import { useDispatch, useSelector, shallowEqual } from 'react-redux';
@@ -43,26 +42,26 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
   const [
     noteDateFormat,
     iconColor,
-    isNoteEditingTriggeredByAnnotationPopup,
     isStateDisabled,
     language,
   ] = useSelector(
     state => [
       selectors.getNoteDateFormat(state),
       selectors.getIconColor(state, mapAnnotationToKey(annotation)),
-      selectors.getIsNoteEditing(state),
       selectors.isElementDisabled(state, 'notePopupState'),
       selectors.getCurrentLanguage(state),
     ],
     shallowEqual,
   );
 
-  const { isSelected, searchInput, resize, isContentEditable, pendingEditTextMap, onTopNoteContentClicked } = useContext(
+  const { isSelected, searchInput, resize, pendingEditTextMap, onTopNoteContentClicked } = useContext(
     NoteContext,
   );
-  
+
   const dispatch = useDispatch();
   const isReply = annotation.isReply();
+
+  const [t] = useTranslation();
 
   useDidUpdate(() => {
     if (!isEditing) {
@@ -71,19 +70,6 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
 
     resize();
   }, [isEditing]);
-
-  useEffect(() => {
-    // when the comment button in the annotation popup is clicked,
-    // this effect will run and we set isEditing to true so that
-    // the textarea will be rendered and focused after it is mounted
-    if (
-      isNoteEditingTriggeredByAnnotationPopup &&
-      isSelected &&
-      isContentEditable
-    ) {
-      setIsEditing(true, noteIndex);
-    }
-  }, [isContentEditable, isNoteEditingTriggeredByAnnotationPopup, isSelected, setIsEditing, noteIndex]);
 
   const renderAuthorName = useCallback(
     annotation => {
@@ -96,8 +82,8 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
           }}
         />
       ) : (
-          '(no name)'
-        );
+        t('option.notesPanel.noteContent.noName')
+      );
     },
     [searchInput],
   );
@@ -155,6 +141,13 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     }
   };
 
+  const handleContentsClicked = (e) => {
+    if (window.getSelection()?.toString()) {
+      e?.stopPropagation();
+      return;
+    }
+  };
+
   const noteContentClass = classNames({
     NoteContent: true,
     isReply,
@@ -162,64 +155,69 @@ const NoteContent = ({ annotation, isEditing, setIsEditing, noteIndex, onTextCha
     clicked: isNonReplyNoteRead, //The top note content is read
   });
 
-  const header = useMemo(() => (
-    <React.Fragment>
-      {!isReply &&
-        <div className="type-icon-container">
-          {isUnread &&
-            <div className="unread-notification"></div>
-          }
-          <Icon className="type-icon" glyph={icon} color={color} fillColor={fillColor} />
-        </div>
-      }
-      <div className="author-and-date">
-        <div className="author-and-overflow">
-          <div className="author-and-time">
-            {renderAuthorName(annotation)}
-            <div className="date-and-num-replies">
-            <div className="date-and-time">
-              {dayjs(getLatestActivityDate(annotation)).locale(language).format(noteDateFormat)}
+  const header = useMemo(
+    () => {
+      const latestActivityDate = getLatestActivityDate(annotation);
+      return (
+        <React.Fragment>
+          {!isReply &&
+            <div className="type-icon-container">
+              {isUnread &&
+                <div className="unread-notification"></div>
+              }
+              <Icon className="type-icon" glyph={icon} color={color} fillColor={fillColor} />
             </div>
-               {numberOfReplies > 0 &&
-                <div className="num-replies-container">
-                  <Icon className="num-reply-icon" glyph={"icon-chat-bubble"} />
-                  <div className="num-replies">{numberOfReplies}</div>
-                </div>}
+          }
+          <div className="author-and-date">
+            <div className="author-and-overflow">
+              <div className="author-and-time">
+                {renderAuthorName(annotation)}
+                <div className="date-and-num-replies">
+                  <div className="date-and-time">
+                    {latestActivityDate ? dayjs(latestActivityDate).locale(language).format(noteDateFormat) : t('option.notesPanel.noteContent.noDate')}
+                  </div>
+                  {numberOfReplies > 0 &&
+                    <div className="num-replies-container">
+                      <Icon className="num-reply-icon" glyph={"icon-chat-bubble"} />
+                      <div className="num-replies">{numberOfReplies}</div>
+                    </div>}
                 </div>
-          </div>
-          <div className="state-and-overflow">
-            <NoteUnpostedCommentIndicator annotationId={annotation.Id} />
-            {!isStateDisabled && !isReply &&
-              <NoteState
+              </div>
+              <div className="state-and-overflow">
+                <NoteUnpostedCommentIndicator annotationId={annotation.Id} />
+                {!isStateDisabled && !isReply &&
+                  <NoteState
+                    annotation={annotation}
+                    isSelected={isSelected}
+                  />
+                }
+                {!isEditing && isSelected &&
+                  <NotePopup
+                    noteIndex={noteIndex}
+                    annotation={annotation}
+                    setIsEditing={setIsEditing}
+                  />}
+              </div>
+            </div>
+            {isEditing && isSelected ? (
+              <ContentArea
                 annotation={annotation}
-                isSelected={isSelected}
-              />
-            }
-            {!isEditing && isSelected &&
-              <NotePopup
                 noteIndex={noteIndex}
-                annotation={annotation}
                 setIsEditing={setIsEditing}
-              />}
+                textAreaValue={textAreaValue}
+                onTextAreaValueChange={onTextChange}
+              />
+            ) : (
+              contentsToRender && (
+                <div className="container" onClick={handleContentsClicked}>{renderContents(contentsToRender)}</div>
+              )
+            )}
           </div>
-        </div>
-        {isEditing && isSelected ? (
-          <ContentArea
-            annotation={annotation}
-            noteIndex={noteIndex}
-            setIsEditing={setIsEditing}
-            textAreaValue={textAreaValue}
-            onTextAreaValueChange={onTextChange}
-          />
-        ) : (
-            contentsToRender && (
-              <div className="container">{renderContents(contentsToRender)}</div>
-            )
-          )}
-      </div>
-    </React.Fragment>
-  ), [isReply, numberOfReplies, formatNumberOfReplies, icon, color, renderAuthorName, annotation, noteDateFormat, isStateDisabled, isSelected, isEditing, setIsEditing, contents, renderContents, textAreaValue, onTextChange, language, isUnread]);
-
+        </React.Fragment>
+      );
+    },
+    [isReply, numberOfReplies, formatNumberOfReplies, icon, color, renderAuthorName, annotation, noteDateFormat, isStateDisabled, isSelected, isEditing, setIsEditing, contents, renderContents, textAreaValue, onTextChange, language, isUnread]
+  );
 
   return useMemo(
     () => (
@@ -253,7 +251,10 @@ const ContentArea = ({
   useEffect(() => {
     // on initial mount, focus the last character of the textarea
     if (isNotesPanelOpen && textareaRef.current) {
-      textareaRef.current.focus();
+      setTimeout(() => {
+        // need setTimeout because textarea seem to rerender and unfocus
+        textareaRef.current.focus();
+      }, 0);
       const textLength = textareaRef.current.value.length;
       textareaRef.current.setSelectionRange(textLength, textLength);
     }
@@ -281,7 +282,7 @@ const ContentArea = ({
 
     setIsEditing(false, noteIndex);
     // Only set comment to unposted state if it is not empty
-    if (textAreaValue !== ''){
+    if (textAreaValue !== '') {
       onTextAreaValueChange(undefined, annotation.Id);
     }
   };
@@ -299,7 +300,7 @@ const ContentArea = ({
         aria-label={`${t('action.comment')}...`}
       />
       <div className="edit-buttons">
-        <div
+        <button
           className="cancel-button"
           onClick={e => {
             e.stopPropagation();
@@ -309,16 +310,17 @@ const ContentArea = ({
           }}
         >
           {t('action.cancel')}
-        </div>
-        <div
-          className="save-button"
+        </button>
+        <button
+          className={`save-button${!textAreaValue ? ' disabled' : ''}`}
+          disabled={!textAreaValue}
           onClick={e => {
             e.stopPropagation();
             setContents(e);
           }}
         >
           {t('action.save')}
-        </div>
+        </button>
       </div>
     </div>
   );

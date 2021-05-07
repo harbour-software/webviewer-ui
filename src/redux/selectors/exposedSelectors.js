@@ -124,6 +124,10 @@ export const getToolButtonObjects = state => {
   return state.viewer.toolButtonObjects;
 };
 
+export const isToolGroupReorderingEnabled = state => {
+  return state.viewer.enableToolGroupReordering;
+};
+
 export const getActiveToolNamesForActiveToolGroup = state => {
   const { activeToolGroup } = state.viewer;
   const toolButtonObjects = getToolButtonObjects(state);
@@ -218,6 +222,8 @@ export const getDisabledCustomPanelTabs = state =>
 
 export const isEmbedPrintSupported = state => isChrome && !isAndroid && state.viewer.useEmbeddedPrint;
 
+export const isOutlineControlVisible = state => state.viewer.outlineControlVisibility;
+
 export const getColorMap = state => state.viewer.colorMap;
 
 export const getCursorOverlayData = state => state.viewer.cursorOverlay;
@@ -252,7 +258,7 @@ export const getSignatureFonts = state => state.viewer.signatureFonts;
 
 export const getSelectedTab = (state, id) => state.viewer.tab[id];
 
-export const getCustomElementOverrides = (state, dataElement) => state.viewer.customElementOverrides[dataElement];
+export const getCustomElementOverrides = (state, dataElement = '') => state.viewer.customElementOverrides[dataElement];
 
 export const getPopupItems = (state, popupDataElement) =>
   state.viewer[popupDataElement] || [];
@@ -266,6 +272,8 @@ export const getIsThumbnailReorderingEnabled = state => state.viewer.isThumbnail
 export const getIsThumbnailMultiselectEnabled = state => state.viewer.isThumbnailMultiselect;
 
 export const getIsMultipleViewerMerging = state => state.viewer.isMultipleViewerMerging;
+
+export const getEnableNotesPanelVirtualizedList = state => state.viewer.enableNotesPanelVirtualizedList;
 
 export const getAllowPageNavigation = state => state.viewer.allowPageNavigation;
 

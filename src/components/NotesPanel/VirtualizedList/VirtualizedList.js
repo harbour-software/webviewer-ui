@@ -8,17 +8,19 @@ const propTypes = {
   children: PropTypes.func.isRequired,
   onScroll: PropTypes.func.isRequired,
   initialScrollTop: PropTypes.number.isRequired,
-  selectedIndex: PropTypes.number
+  selectedIndex: PropTypes.number,
+  scrollToSelectedAnnot: PropTypes.bool,
 };
 
 const cache = new CellMeasurerCache({ defaultHeight: 50, fixedWidth: true });
 
 const VirtualizedList = React.forwardRef(
-  ({ notes, children, onScroll, initialScrollTop, selectedIndex }, forwardedRef) => {
+  ({ notes, children, onScroll, initialScrollTop, selectedIndex, scrollToSelectedAnnot }, forwardedRef) => {
     const listRef = useRef();
     const [offset, setOffset] = useState(0);
     const [dimension, setDimension] = useState({ width: 0, height: 0 });
     let prevWindowHeight = window.innerHeight;
+    let resizeTimeout = null;
 
     useImperativeHandle(forwardedRef, () => ({
       scrollToPosition: scrollTop => {
@@ -35,7 +37,7 @@ const VirtualizedList = React.forwardRef(
 
     useEffect(() => {
       cache.clearAll();
-      listRef?.current?.recomputeRowHeights();
+      listRef?.current?.measureAllRows();
 
       if(selectedIndex !== -1) {
         listRef.current?.scrollToRow(selectedIndex);
@@ -81,10 +83,6 @@ const VirtualizedList = React.forwardRef(
     const _resize = index => {
       cache.clear(index);
       listRef.current?.recomputeRowHeights(index);
-
-      if(selectedIndex !== -1) {
-        listRef.current?.scrollToRow(selectedIndex);
-      }
     };
 
     const handleScroll = ({ scrollTop }) => {
@@ -104,9 +102,13 @@ const VirtualizedList = React.forwardRef(
           parent={parent}
           rowIndex={index}
         >
+          {({ measure }) => (
           <div style={{ ...style, paddingRight: '12px' }}>
-            {children(notes, index, () => _resize(index))}
-          </div>
+            {children(notes, index, () => {
+              _resize(index);
+              measure();
+            })}
+          </div>)}
         </CellMeasurer>
       );
     };
@@ -133,7 +135,6 @@ const VirtualizedList = React.forwardRef(
               rowHeight={cache.rowHeight}
               rowRenderer={rowRenderer}
               onScroll={handleScroll}
-              scrollToAlignment={"start"}
             />
           </div>
         )}

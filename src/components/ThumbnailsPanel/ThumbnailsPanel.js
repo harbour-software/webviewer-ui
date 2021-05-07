@@ -172,7 +172,7 @@ const ThumbnailsPanel = () => {
       } else {
         setAllowPageOperations(false);
       }
-  
+
       dispatch(actions.setSelectedPageThumbnails([]));
     };
 
@@ -187,7 +187,7 @@ const ThumbnailsPanel = () => {
     core.addEventListener('finishedRendering', onFinishedRendering);
     core.addEventListener('documentLoaded', onDocumentLoaded);
     core.addEventListener('pageComplete', onPageComplete);
-    
+
 
     // The document might have already been loaded before this component is mounted.
     // If document is already loaded, call 'onDocumentLoaded()' manually to update the state properly.
@@ -266,7 +266,7 @@ const ThumbnailsPanel = () => {
   }, [isReaderMode]);
 
   // if disabled or is not open return
-  if(isDisabled || !isOpen){
+  if (isDisabled || !isOpen) {
     return null
   }
 
@@ -451,7 +451,8 @@ const ThumbnailsPanel = () => {
       {!isThumbnailSliderDisabled && <div data-element="thumbnailsSizeSlider" className="thumbnail-slider-container">
         <Button
           img="icon-zoom-thumb-out"
-          title="action.thumbZoomOut"
+          title="action.zoomOut"
+          hideTooltipShortcut
           onClick={() => {
             if (thumbnailSize - Number(ZOOM_RANGE_STEP) > Number(ZOOM_RANGE_STEP)) {
               setThumbnailSize(thumbnailSize - Number(ZOOM_RANGE_STEP));
@@ -475,7 +476,8 @@ const ThumbnailsPanel = () => {
         />
         <Button
           img="icon-zoom-thumb-in"
-          title="action.thumbZoomIn"
+          title="action.zoomIn"
+          hideTooltipShortcut
           onClick={() => {
             if (thumbnailSize + Number(ZOOM_RANGE_STEP) < 1001) {
               setThumbnailSize(thumbnailSize + Number(ZOOM_RANGE_STEP));
@@ -501,6 +503,8 @@ const ThumbnailsPanel = () => {
                 overscanRowCount={3}
                 className={'thumbnailsList'}
                 style={{ outline: 'none' }}
+                // Ensure we show the current page in the thumbnails when we open the panel
+                scrollToIndex={currentPage - 1}
               />
             </div>
           </div>
