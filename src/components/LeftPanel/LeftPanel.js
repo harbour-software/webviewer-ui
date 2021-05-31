@@ -17,6 +17,7 @@ import core from 'core';
 import selectors from 'selectors';
 import actions from 'actions';
 import useMedia from 'hooks/useMedia';
+import { isIE } from 'helpers/device';
 
 import './LeftPanel.scss';
 
@@ -37,9 +38,20 @@ const LeftPanel = () => {
     false,
   );
 
-  const [currentToolbarGroup, isToolsHeaderOpen,isOpen, isDisabled, activePanel, customPanels, currentWidth, notesInLeftPanel] = useSelector(
+  const [
+    currentToolbarGroup,
+    isHeaderOpen,
+    isToolsHeaderOpen,
+    isOpen,
+    isDisabled,
+    activePanel,
+    customPanels,
+    currentWidth,
+    notesInLeftPanel,
+  ] = useSelector(
     state => [
       selectors.getCurrentToolbarGroup(state),
+      selectors.isElementOpen(state, 'header'),
       selectors.isElementOpen(state, 'toolsHeader'),
       selectors.isElementOpen(state, 'leftPanel'),
       selectors.isElementDisabled(state, 'leftPanel'),
@@ -80,6 +92,7 @@ const LeftPanel = () => {
         LeftPanel: true,
         'closed': !isVisible,
         'tools-header-open': isToolsHeaderOpen && currentToolbarGroup !== 'toolbarGroup-View',
+        'tools-header-and-header-hidden': !isHeaderOpen && !isToolsHeaderOpen,
       })}
       onDrop={onDrop}
       onDragOver={onDragOver}
@@ -129,7 +142,12 @@ const LeftPanel = () => {
           dataElement="leftPanelResizeBar"
           minWidth={minWidth}
           onResize={_width => {
-            dispatch(actions.setLeftPanelWidth(_width));
+            let maxAllowedWidth = window.innerWidth
+            // there will be a scroll bar in IE, so we don't allow 100% page width
+            if (isIE) {
+              maxAllowedWidth = maxAllowedWidth - 30;
+            } 
+            dispatch(actions.setLeftPanelWidth(Math.min(_width, maxAllowedWidth)));
           }}
         />}
     </div>
