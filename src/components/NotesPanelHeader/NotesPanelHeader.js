@@ -18,6 +18,11 @@ import { getSortStrategies } from 'constants/sortStrategies';
 import DataElements from 'constants/dataElement';
 import { OfficeEditorEditMode } from 'constants/officeEditor';
 import useFocusHandler from 'hooks/useFocusHandler';
+import fireEvent from 'helpers/fireEvent';
+
+import DatePicker from 'react-datepicker';
+// https://github.com/glennflanagan/react-collapsible
+import Collapsible from 'react-collapsible';
 
 import './NotesPanelHeader.scss';
 import Icon from '../Icon';
@@ -66,6 +71,17 @@ function NotesPanelHeader({
   const [filterEnabled, setFilterEnabled] = useState(false);
   const [isPreviewingTrackedChanges, setIsPreviewingTrackedChanges] = useState(false);
   const [searchInput, setSearchInput] = useState('');
+  const [startDate, setStartDate] = useState();
+  const _annotHistoryDtpOnChange = date => {
+    setStartDate(date)
+    // let evt = new CustomEvent('annotHistoryDateSelected', { 
+    //   bubbles: true,
+    //   composed: true,
+    //   detail: date });
+    // window.dispatchEvent(evt);
+    fireEvent('annotHistoryDateSelected', date);
+    //console.log(`This is from _annotHistoryDtpOnChange: ${date}`)
+  }
 
   useEffect(() => {
     // check if Redux filter state is enabled on mount and set filterEnabled to true
@@ -133,15 +149,24 @@ function NotesPanelHeader({
 
   const openFilterModalWithFocusTransfer = useFocusHandler(() => dispatch(actions.openElement('filterModal')));
   const placeholderText = isOfficeEditorMode ? t('message.searchSuggestionsPlaceholder') : t('message.searchCommentsPlaceholder');
-  const originalHeaderElement = (
-    <DataElementWrapper
-      className={
-        classNames({
-          'header': true,
-          'modular-ui-header': customizableUI,
-        })}
-      dataElement="notesPanelHeader"
-    >
+
+  const collapsedHeaderElement = (
+    <Collapsible trigger="History / Search">
+      <span className="label">History:&nbsp;</span>
+      <div className="input-container">
+        <DatePicker 
+          id="annotHistoryDtp"
+          selected={startDate}
+          showTimeSelect
+          timeIntervals={15}
+          dateFormat="dd/MM/yyyy h:mm aa"
+          isClearable
+          placeholderText="Select a date to view annotation history"
+          portalId="notesPanelHeader"
+          onChange={(date) => _annotHistoryDtpOnChange(date)}
+        />
+      </div>
+      <br />
       <DataElementWrapper
         className={classNames({
           'input-container': true,
@@ -160,6 +185,20 @@ function NotesPanelHeader({
           value={searchInput}
         />
       </DataElementWrapper>
+    </Collapsible>
+  );
+
+  const originalHeaderElement = (
+    <DataElementWrapper
+      className={
+        classNames({
+          'header': true,
+          'modular-ui-header': customizableUI,
+        })}
+      dataElement="notesPanelHeader"
+    >
+
+      { collapsedHeaderElement }
 
       <DataElementWrapper
         className="comments-counter"
@@ -176,6 +215,13 @@ function NotesPanelHeader({
         <div
           className="buttons-container"
         >
+          <Button
+            dataElement="hideShowNotesButton"
+            className="hide-show-notes-button"
+            title="Toggle Annotations"
+            img="icon-header-chat-fill"
+          />
+
           {isMultiSelectEnabled && !isOfficeEditorMode && (
             <Button
               dataElement={DataElements.NOTE_MULTI_SELECT_MODE_BUTTON}
