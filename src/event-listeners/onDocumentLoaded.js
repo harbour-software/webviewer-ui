@@ -33,6 +33,9 @@ const getIsCustomUIEnabled = (store) => selectors.getIsCustomUIEnabled(store.get
 export default (store, documentViewerKey) => async () => {
   const { dispatch } = store;
   dispatch(actions.openElement('pageNavOverlay'));
+  dispatch(actions.openElement('pageSliderOverlay'));
+  dispatch(actions.openElement('pagePreviousOverlay'));
+  dispatch(actions.openElement('pageNextOverlay'));
   // init zoom level value in redux
   dispatch(actions.setZoom(core.getZoom(documentViewerKey), documentViewerKey));
   dispatch(actions.setThumbnailSelectingPages(false));
