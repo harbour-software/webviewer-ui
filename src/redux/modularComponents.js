@@ -65,7 +65,7 @@ const defaultModularHeaders = {
     placement: 'bottom',
     grow: 0,
     gap: 12,
-    position: 'center',
+    position: 'start',
     opacityMode: 'dynamic',
     opacity: 'none',
     'float': true,
@@ -186,7 +186,7 @@ const defaultModularComponents = {
   },
   'menuButton': {
     dataElement: DataElements.MENU_OVERLAY_BUTTON,
-    img: 'ic-hamburger-menu',
+    img: 'icon-header-three-dots-vertical',
     title: 'component.menuOverlay',
     toggleElement: 'MainMenuFlyout',
     type: 'toggleButton',
