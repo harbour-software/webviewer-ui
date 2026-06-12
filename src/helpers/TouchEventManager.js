@@ -380,16 +380,16 @@ const TouchEventManager = {
           const tool = core.getToolMode(this.documentViewerKey);
           tool.finish?.();
         } else if (!isFreeTextUnderMouse) {
-          if (this.oldZoom) {
-            this.touch.scale = Math.max(this.oldZoom / this.touch.zoom, getMinZoomLevel() / this.touch.zoom);
-            this.oldZoom = null;
-          } else {
-            this.touch.scale = Math.min(3, getMaxZoomLevel() / this.touch.zoom);
-            this.oldZoom = this.touch.zoom;
-          }
-          const zoom = core.getZoom(this.documentViewerKey) * this.touch.scale;
-          const { x, y } = this.getPointAfterScale();
-          core.zoomTo(zoom, x, y, this.documentViewerKey);
+          // if (this.oldZoom) {
+          //   this.touch.scale = Math.max(this.oldZoom / this.touch.zoom, getMinZoomLevel() / this.touch.zoom);
+          //   this.oldZoom = null;
+          // } else {
+          //   this.touch.scale = Math.min(3, getMaxZoomLevel() / this.touch.zoom);
+          //   this.oldZoom = this.touch.zoom;
+          // }
+          // const zoom = core.getZoom(this.documentViewerKey) * this.touch.scale;
+          // const { x, y } = this.getPointAfterScale();
+          // core.zoomTo(zoom, x, y, this.documentViewerKey);
         }
 
         if (isFreeTextUnderMouse) {
